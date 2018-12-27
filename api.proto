@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package mashroom.zoopla;
+
+//import "google/protobuf/wrappers.proto"; use if common types are required
+
+option go_package = "gitlab.okta-solutions.com/mashroom/backend/zoopla";
+
+message PropertyRequest {
+    string some_field = 1;
+}
+
+message PropertyResponse {
+    string status = 1;
+}
+
+message Coordinates {
+    double Latitude = 1;
+    double Longitude = 2;
+}
+
+message PafAddress {
+    string AddressKey = 1;
+    string OrganisationKey = 2;
+    string PostcodeType = 3;
+}
+
+message Location {
+    string CountryCode = 1;
+    string County = 2;
+    string Locality = 3;
+    string PafUdprn = 4;
+    string PostalCode = 5;
+    string PropertyNumberOrName = 6;
+    string StreetName = 7;
+    string TownOrCity = 8;
+    Coordinates Coordinates = 9;
+    PafAddress PafAddress = 10;
+}
+
+message BranchUpdateRequest {
+    string BranchName = 1;
+    string BranchReference = 2;
+    string Email = 3;
+    Location Location = 4;
+    string Telephone = 5;
+    string Website = 6;
+}
+
+message BranchUpdateResponse {
+    string result = 1;
+}
+
+service ZooplaService {
+    rpc BranchUpdate (BranchUpdateRequest) returns (BranchUpdateResponse);
+    rpc ListProperty (PropertyRequest) returns (PropertyResponse);
+    rpc UpdateProperty (PropertyRequest) returns (PropertyResponse);
+    rpc DeleteProperty (PropertyRequest) returns (PropertyResponse);
+    rpc GetProperty (PropertyRequest) returns (PropertyResponse);
+    rpc GetPropertyInfo (PropertyRequest) returns (PropertyResponse);
+
+
+}
