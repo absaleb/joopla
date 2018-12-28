@@ -9,6 +9,63 @@ type ZooplaBranchUpdateRequest struct {
 	Website         string    `json:"website,omitempty"`
 }
 
+type ZooplaListingUpdateRequest struct {
+	BranchReference     string                 `json:"branch_reference"`
+	Category            string                 `json:"category"`
+	ListingReference    string                 `json:"listing_reference"`
+	Location            *Location              `json:"location"`
+	Pricing             *Pricing               `json:"pricing"`
+	PropertyType        string                 `json:"property_type"`
+	Areas               *Areas                 `json:"areas"`
+	BillsIncluded       []string               `json:"bills_included"`
+	DetailedDescription []*DetailedDescription `json:"detailed_description"`
+	FurnishedState      string                 `json:"furnished_state"`
+	LifeCycleStatus     string                 `json:"life_cycle_status"`
+	AvailableFromDate   string                 `json:"available_from_date"`
+	Bathrooms         int32    `json:"bathrooms"`
+	DisplayAddress    string `json:"display_address"`
+	RentalTerm        string `json:"rental_term"`
+	TotalBedrooms     int32    `json:"total_bedrooms"`
+}
+
+type ZooplaListingDeleteRequest struct {
+	DeletionReason   string `json:"deletion_reason,omitempty"`
+	ListingReference string `json:"listing_reference"`
+}
+
+type ZooplaListingListRequest struct {
+	BranchReference string `json:"branch_reference"`
+}
+
+type ZooplaBranchUpdateResponse struct {
+	Status          string `json:"status"`
+	BranchReference string `json:"branch_reference"`
+	NewBranch       bool   `json:"new_branch"`
+}
+
+type ZooplaListingUpdateResponse struct {
+	Status           string `json:"status"`
+	ListingReference string `json:"listing_reference"`
+	ListingEtag      string `json:"listing_etag"`
+	URL              string `json:"url"`
+	NewListing       bool   `json:"new_listing"`
+}
+
+type ZooplaListingDeleteResponse struct {
+	Status           string `json:"status"`
+	ListingReference string `json:"listing_reference"`
+}
+
+type ZooplaListingListResponse struct {
+	Status          string `json:"status"`
+	BranchReference string `json:"branch_reference"`
+	Listings        []struct {
+		ListingReference string `json:"listing_reference"`
+		ListingEtag      string `json:"listing_etag"`
+		URL              string `json:"url"`
+	} `json:"listings"`
+}
+
 // Coordinates
 type Coordinates struct {
 	Latitude  float64 `json:"latitude"`
@@ -34,29 +91,6 @@ type PafAddress struct {
 	AddressKey      string `json:"address_key"`
 	OrganisationKey string `json:"organisation_key"`
 	PostcodeType    string `json:"postcode_type"`
-}
-
-type ListingDelete struct {
-	DeletionReason string `json:"deletion_reason,omitempty"`
-	ListingReference string `json:"listing_reference"`
-}
-
-type ListingList struct {
-	BranchReference string `json:"branch_reference"`
-}
-
-type ListingUpdate struct {
-	BranchReference     string                 `json:"branch_reference"`
-	Category            string                 `json:"category"`
-	ListingReference    string                 `json:"listing_reference"`
-	Location            Location               `json:"location"`
-	Pricing             Pricing                `json:"pricing"`
-	PropertyType        string                 `json:"property_type"`
-	Areas               Areas                  `json:"areas"`
-	BillsIncluded       []string               `json:"bills_included"`
-	DetailedDescription []*DetailedDescription `json:"detailed_description"`
-	FurnishedState      string                 `json:"furnished_state"`
-	LifeCycleStatus     string                 `json:"life_cycle_status"`
 }
 
 // Area
@@ -223,5 +257,3 @@ type TenantEligibility struct {
 	Dss      string `json:"dss,omitempty"`
 	Students string `json:"students,omitempty"`
 }
-
-

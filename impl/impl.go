@@ -2,18 +2,26 @@ package impl
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 const (
-	webClientTimeout       = 3000
-	ZooplaClientTimeout    = 3000
-	ZooplaApiKey           = "qh46j22xzsx79byk84vb9tms"
-	ZooplaListingUrl       = "https://realtime-listings-api.webservices.zpg.co.uk/sandbox/v1/"
-	ZooplaListingHeaderUrl = "https://realtime-listings.webservices.zpg.co.uk/docs/v1.2/schemas/"
+	webClientTimeout        = 3000
+	ZooplaClientTimeout     = 3000
+	ZooplaApiKey            = "qh46j22xzsx79byk84vb9tms"
+	ZooplaBranchReference   = "MashroomZooplaBranch"
+	ZooplaBranchName        = "Mashroom"
+	ZooplaBranchEmail       = "Mashroom@Mashroom"
+	ZooplaBranchCountryCode = "gb"
+	ZooplaBranchPostalCode  = "a11 1A1"
+	ZooplaBranchStreeName   = "Mashroom street"
+	ZooplaBranchTownOrCity  = "London"
+	ZooplaBranchTelephone   = "02079460184"
+	ZooplaBranchWebsite     = "http://www.mashroom.com"
+	ZooplaListingUrl        = "https://realtime-listings-api.webservices.zpg.co.uk/sandbox/v1/"
+	ZooplaListingHeaderUrl  = "https://realtime-listings.webservices.zpg.co.uk/docs/v1.2/schemas/"
 )
 
 type ZooplaMethod int
@@ -39,12 +47,23 @@ func (z ZooplaMethod) String() string {
 	return names[z]
 }
 
-type ZooplaBranchUpdateResponse struct {
-	result string
-}
-
-func BranchUpdateImpl(request ZooplaBranchUpdateRequest) (*ZooplaBranchUpdateResponse, error) {
+func BranchUpdateImpl() (*ZooplaBranchUpdateResponse, error) {
 	method := Branch_update
+
+	request := ZooplaBranchUpdateRequest{
+		BranchName:      ZooplaBranchName,
+		BranchReference: ZooplaBranchReference,
+		Email:           ZooplaBranchEmail,
+		Location: &Location{
+			Coordinates: &Coordinates{Longitude: 0.0, Latitude: 0.0},
+			CountryCode: ZooplaBranchCountryCode,
+			PostalCode:  ZooplaBranchPostalCode,
+			StreetName:  ZooplaBranchStreeName,
+			TownOrCity:  ZooplaBranchTownOrCity,
+		},
+		Telephone: ZooplaBranchTelephone,
+		Website:   ZooplaBranchWebsite,
+	}
 	jsn, err := getJSON(request)
 	if err != nil {
 		return nil, err
@@ -61,19 +80,112 @@ func BranchUpdateImpl(request ZooplaBranchUpdateRequest) (*ZooplaBranchUpdateRes
 	headerValue := fmt.Sprintf("application/json; profile=%s%s.json", ZooplaListingHeaderUrl, method)
 	req.Header.Set("Content-Type", headerValue)
 
-	client := &http.Client{}
-	client.Timeout = ZooplaClientTimeout * time.Millisecond
-
-	resp, err := client.Do(req)
+	respBytes, err := getBytes(req, ZooplaClientTimeout)
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	var result ZooplaBranchUpdateResponse
+	err = json.Unmarshal(respBytes, &result)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ZooplaBranchUpdateResponse{result: string(body)}, nil
+	return &result, nil
+}
+
+func ListingUpdateImpl(request ZooplaListingUpdateRequest) (*ZooplaListingUpdateResponse, error) {
+	method := Listing_update
+	jsn, err := getJSON(request)
+	if err != nil {
+		return nil, err
+	}
+
+	data := []byte(*jsn)
+	addr := fmt.Sprintf("%s%s.json", ZooplaListingUrl, method)
+
+	req, err := http.NewRequest("POST", addr, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return nil, err
+	}
+
+	headerValue := fmt.Sprintf("application/json; profile=%s%s.json", ZooplaListingHeaderUrl, method)
+	req.Header.Set("Content-Type", headerValue)
+
+	respBytes, err := getBytes(req, ZooplaClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ZooplaListingUpdateResponse
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func ListingDeleteImpl(request ZooplaListingDeleteRequest) (*ZooplaListingDeleteResponse, error) {
+	method := Listing_delete
+	jsn, err := getJSON(request)
+	if err != nil {
+		return nil, err
+	}
+
+	data := []byte(*jsn)
+	addr := fmt.Sprintf("%s%s.json", ZooplaListingUrl, method)
+
+	req, err := http.NewRequest("POST", addr, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return nil, err
+	}
+
+	headerValue := fmt.Sprintf("application/json; profile=%s%s.json", ZooplaListingHeaderUrl, method)
+	req.Header.Set("Content-Type", headerValue)
+
+	respBytes, err := getBytes(req, ZooplaClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ZooplaListingDeleteResponse
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func ListingListImpl(request ZooplaListingListRequest) (*ZooplaListingListResponse, error) {
+	method := Listing_list
+	jsn, err := getJSON(request)
+	if err != nil {
+		return nil, err
+	}
+
+	data := []byte(*jsn)
+	addr := fmt.Sprintf("%s%s.json", ZooplaListingUrl, method)
+
+	req, err := http.NewRequest("POST", addr, bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return nil, err
+	}
+
+	headerValue := fmt.Sprintf("application/json; profile=%s%s.json", ZooplaListingHeaderUrl, method)
+	req.Header.Set("Content-Type", headerValue)
+
+	respBytes, err := getBytes(req, ZooplaClientTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	var result ZooplaListingListResponse
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

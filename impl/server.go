@@ -20,14 +20,70 @@ type Server interface {
 type serverImpl struct {
 }
 
+func GetBranchUpdateResponse(resp *ZooplaBranchUpdateResponse) *zoopla.BranchUpdateResponse {
+
+	result := &zoopla.BranchUpdateResponse{
+		Status: resp.Status,
+	}
+
+	return result
+}
+
+func ToZooplaListUpdateRequest(req *zoopla.Property) (*ZooplaListingUpdateRequest, error) {
+	detailedDescription := []*DetailedDescription{}
+	for _, v := range req.DetailedDescription {
+		detailedDescription = append(detailedDescription, &DetailedDescription{Text: v.Text})
+	}
+
+	result := &ZooplaListingUpdateRequest{
+		BranchReference:  ZooplaBranchReference,
+		DisplayAddress:   req.Address.Value,
+		RentalTerm:       req.RentalTerm,
+		//Category:         "commercial" | "residential" category???,
+		ListingReference: req.Id,
+		// Pricing: &Pricing{
+		// 	RentFrequency:   req.Pricing.RentFrequency,
+		// 	CurrencyCode:    req.Pricing.CurrencyCode,
+		// 	Price:           req.Pricing.Price,
+		// 	TransactionType: req.Pricing.TransactionType,
+		// }???,
+		Location: &Location{
+			CountryCode:          req.CountryCode.Value,
+			PostalCode:           req.Postcode.Value,
+			//PropertyNumberOrName: req.Location.PropertyNumberOrName,
+			StreetName:           req.Address.Value,
+			TownOrCity:           req.City.Value,
+		},
+		PropertyType:      property_type???,
+		AvailableFromDate: req.Availability Best practice (rent)???,
+		DetailedDescription: detailed_description???,
+		Bathrooms:           bathrooms??? Best practice (residential)???,
+		FurnishedState:      Best practice (residential rent)???,
+		LifeCycleStatus:     life_cycle_status???,
+		TotalBedrooms:        Best practice (residential)???,
+		LivingRooms: Best practice (residential)???,
+	}
+	return result, nil
+}
+
+func GetListUpdateResponse(resp *ZooplaListingUpdateResponse) *zoopla.ListUpdateResponse {
+
+	result := &zoopla.ListUpdateResponse{
+		Status:           resp.Status,
+		ListingReference: resp.ListingReference,
+		Etag:             resp.ListingEtag,
+		Url:              resp.URL,
+	}
+
+	return result
+}
+
 func (server *serverImpl) BranchUpdate(ctx context.Context, request *zoopla.BranchUpdateRequest) (*zoopla.BranchUpdateResponse, error) {
 	if request == nil {
 		return nil, errs.NilRequest
 	}
 
-	req, err := GetZooplaBranchUpdateRequest(request)
-
-	resp, err := BranchUpdateImpl(*req)
+	resp, err := BranchUpdateImpl()
 	if err != nil {
 		return nil, err
 	}
@@ -36,54 +92,42 @@ func (server *serverImpl) BranchUpdate(ctx context.Context, request *zoopla.Bran
 	return result, nil
 }
 
-func GetZooplaBranchUpdateRequest(req *zoopla.BranchUpdateRequest) (*ZooplaBranchUpdateRequest, error) {
-	result := &ZooplaBranchUpdateRequest{
-		BranchName:      req.BranchName,
-		BranchReference: req.BranchReference,
-		Email:           req.Email,
-		Telephone:       req.Telephone,
-		Website:         req.Website,
-		Location: &Location{
-			Coordinates: &Coordinates{
-				Longitude: req.Location.Coordinates.Longitude,
-				Latitude:  req.Location.Coordinates.Latitude,
-			},
-			CountryCode:          req.Location.CountryCode,
-			County:               req.Location.County,
-			Locality:             req.Location.Locality,
-			PafUdprn:             req.Location.PafUdprn,
-			PostalCode:           req.Location.PostalCode,
-			PropertyNumberOrName: req.Location.PropertyNumberOrName,
-			StreetName:           req.Location.StreetName,
-			TownOrCity:           req.Location.TownOrCity,
-			PafAddress: &PafAddress{
-				AddressKey:      req.Location.PafAddress.AddressKey,
-				OrganisationKey: req.Location.PafAddress.OrganisationKey,
-				PostcodeType:    req.Location.PafAddress.PostcodeType,
-			},
-		},
+func (server *serverImpl) UpdateProperty(ctx context.Context, request *zoopla.Property) (*zoopla.ListUpdateResponse, error) {
+	if request == nil {
+		return nil, errs.NilRequest
 	}
+
+	req, err := ToZooplaListUpdateRequest(request)
+
+	resp, err := ListingUpdateImpl(*req)
+	if err != nil {
+		return nil, err
+	}
+
+	result := GetListUpdateResponse(resp)
 	return result, nil
 }
-func GetBranchUpdateResponse(resp *ZooplaBranchUpdateResponse) *zoopla.BranchUpdateResponse {
 
-	result := &zoopla.BranchUpdateResponse{
-		Result: resp.result,
+func (server *serverImpl) DeleteProperty(ctx context.Context, request *zoopla.ListDeleteRequest) (*zoopla.ListDeleteResponse, error) {
+	if request == nil {
+		return nil, errs.NilRequest
 	}
 
-	return result
+	req, err := GetZooplaListDeleteRequest(request)
+
+	resp, err := ListingDeleteImpl(*req)
+	if err != nil {
+		return nil, err
+	}
+
+	result := GetListDeleteResponse(resp)
+	return result, nil
 }
 
-func (server *serverImpl) ListProperty(context.Context, *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
-	panic("implement me")
-}
-
-func (server *serverImpl) UpdateProperty(context.Context, *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
-	panic("implement me")
-}
-
-func (server *serverImpl) DeleteProperty(context.Context, *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
-	panic("implement me")
+func (server *serverImpl) ListProperty(ctx context.Context, request *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
+	if request == nil {
+		return nil, errs.NilRequest
+	}
 }
 
 func (server *serverImpl) GetProperty(context.Context, *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
