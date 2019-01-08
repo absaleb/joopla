@@ -158,7 +158,7 @@ func ListingDeleteImpl(request ZooplaListingDeleteRequest) (*ZooplaListingDelete
 	return &result, nil
 }
 
-func ListingListImpl(request ZooplaListingListRequest) (*ZooplaListingListResponse, error) {
+func ListingListImpl(request ZooplaListingRequest) (*ZooplaListingListResponse, error) {
 	method := Listing_list
 	jsn, err := getJSON(request)
 	if err != nil {

@@ -2,13 +2,16 @@ package impl
 
 import (
 	"context"
+	"github.com/salebgithub/joopla"
+	"github.com/salebgithub/joopla/version"
 	"gitlab.okta-solutions.com/mashroom/backend/common/errs"
 	"gitlab.okta-solutions.com/mashroom/backend/common/health"
 	"gitlab.okta-solutions.com/mashroom/backend/common/log"
-	"gitlab.okta-solutions.com/mashroom/backend/zoopla"
-	"gitlab.okta-solutions.com/mashroom/backend/zoopla/version"
 	"google.golang.org/grpc"
 	"net"
+
+	_ "gitlab.okta-solutions.com/mashroom/backend/zoopla"
+	_ "gitlab.okta-solutions.com/mashroom/backend/zoopla/version"
 )
 
 type Server interface {
@@ -20,59 +23,11 @@ type Server interface {
 type serverImpl struct {
 }
 
+
 func GetBranchUpdateResponse(resp *ZooplaBranchUpdateResponse) *zoopla.BranchUpdateResponse {
 
 	result := &zoopla.BranchUpdateResponse{
 		Status: resp.Status,
-	}
-
-	return result
-}
-
-func ToZooplaListUpdateRequest(req *zoopla.Property) (*ZooplaListingUpdateRequest, error) {
-	detailedDescription := []*DetailedDescription{}
-	for _, v := range req.DetailedDescription {
-		detailedDescription = append(detailedDescription, &DetailedDescription{Text: v.Text})
-	}
-
-	result := &ZooplaListingUpdateRequest{
-		BranchReference:  ZooplaBranchReference,
-		DisplayAddress:   req.Address.Value,
-		RentalTerm:       req.RentalTerm,
-		//Category:         "commercial" | "residential" category???,
-		ListingReference: req.Id,
-		// Pricing: &Pricing{
-		// 	RentFrequency:   req.Pricing.RentFrequency,
-		// 	CurrencyCode:    req.Pricing.CurrencyCode,
-		// 	Price:           req.Pricing.Price,
-		// 	TransactionType: req.Pricing.TransactionType,
-		// }???,
-		Location: &Location{
-			CountryCode:          req.CountryCode.Value,
-			PostalCode:           req.Postcode.Value,
-			//PropertyNumberOrName: req.Location.PropertyNumberOrName,
-			StreetName:           req.Address.Value,
-			TownOrCity:           req.City.Value,
-		},
-		PropertyType:      property_type???,
-		AvailableFromDate: req.Availability Best practice (rent)???,
-		DetailedDescription: detailed_description???,
-		Bathrooms:           bathrooms??? Best practice (residential)???,
-		FurnishedState:      Best practice (residential rent)???,
-		LifeCycleStatus:     life_cycle_status???,
-		TotalBedrooms:        Best practice (residential)???,
-		LivingRooms: Best practice (residential)???,
-	}
-	return result, nil
-}
-
-func GetListUpdateResponse(resp *ZooplaListingUpdateResponse) *zoopla.ListUpdateResponse {
-
-	result := &zoopla.ListUpdateResponse{
-		Status:           resp.Status,
-		ListingReference: resp.ListingReference,
-		Etag:             resp.ListingEtag,
-		Url:              resp.URL,
 	}
 
 	return result
@@ -92,7 +47,51 @@ func (server *serverImpl) BranchUpdate(ctx context.Context, request *zoopla.Bran
 	return result, nil
 }
 
-func (server *serverImpl) UpdateProperty(ctx context.Context, request *zoopla.Property) (*zoopla.ListUpdateResponse, error) {
+
+
+func ToZooplaListUpdateRequest(req *zoopla.ListingUpdateRequest) (*ZooplaListingUpdateRequest, error) {
+	var detailedDescription []*DetailedDescription
+	for _, v := range req.DetailedDescription {
+		detailedDescription = append(detailedDescription, &DetailedDescription{Text: v.Text})
+	}
+
+	result := &ZooplaListingUpdateRequest{
+		BranchReference:  ZooplaBranchReference,
+		Category: req.Category,
+		ListingReference: req.ListingReference,
+		Pricing: &Pricing{
+			RentFrequency:   req.Pricing.RentFrequency.String(),
+			CurrencyCode:    req.Pricing.CurrencyCode,
+			Price:           req.Pricing.Price,
+			TransactionType: req.Pricing.TransactionType.String(),
+		},
+		Location: &Location{
+			CountryCode:          req.Location.CountryCode,
+			PostalCode:           req.Location.PostalCode,
+			PropertyNumberOrName: req.Location.PropertyNumberOrName,
+			StreetName:           req.Location.StreetName,
+			TownOrCity:           req.Location.TownOrCity,
+		},
+		PropertyType:   req.PropertyType,
+		DetailedDescription: detailedDescription,
+		LifeCycleStatus:  req.LifeCycleStatus,
+	}
+	return result, nil
+}
+
+func GetListUpdateResponse(resp *ZooplaListingUpdateResponse) *zoopla.ListingUpdateResponse {
+
+	result := &zoopla.ListingUpdateResponse{
+		Status:           resp.Status,
+		ListingReference: resp.ListingReference,
+		Etag:             resp.ListingEtag,
+		Url:              resp.URL,
+	}
+
+	return result
+}
+
+func (server *serverImpl) UpdateProperty(ctx context.Context, request *zoopla.ListingUpdateRequest) (*zoopla.ListingUpdateResponse, error) {
 	if request == nil {
 		return nil, errs.NilRequest
 	}
@@ -108,12 +107,32 @@ func (server *serverImpl) UpdateProperty(ctx context.Context, request *zoopla.Pr
 	return result, nil
 }
 
-func (server *serverImpl) DeleteProperty(ctx context.Context, request *zoopla.ListDeleteRequest) (*zoopla.ListDeleteResponse, error) {
+
+
+
+func ToZooplaListingDeleteRequest(req *zoopla.ListingDeleteRequest) (*ZooplaListingDeleteRequest, error) {
+	result := &ZooplaListingDeleteRequest{
+		ListingReference: req.ListingReference,
+	}
+	return result, nil
+}
+
+func GetListDeleteResponse(resp *ZooplaListingDeleteResponse) *zoopla.ListingDeleteResponse {
+
+	result := &zoopla.ListingDeleteResponse{
+		Status:           resp.Status,
+		ListingReference: resp.ListingReference,
+	}
+
+	return result
+}
+
+func (server *serverImpl) DeleteProperty(ctx context.Context, request *zoopla.ListingDeleteRequest) (*zoopla.ListingDeleteResponse, error) {
 	if request == nil {
 		return nil, errs.NilRequest
 	}
 
-	req, err := GetZooplaListDeleteRequest(request)
+	req, err := ToZooplaListingDeleteRequest(request)
 
 	resp, err := ListingDeleteImpl(*req)
 	if err != nil {
@@ -124,28 +143,48 @@ func (server *serverImpl) DeleteProperty(ctx context.Context, request *zoopla.Li
 	return result, nil
 }
 
-func (server *serverImpl) ListProperty(ctx context.Context, request *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
+
+
+func ToZooplaListingRequest(req *zoopla.ListingListRequest) (*ZooplaListingRequest, error) {
+	result := &ZooplaListingRequest{
+		BranchReference: req.BranchReference,
+	}
+	return result, nil
+}
+
+func GetListingListResponse(resp *ZooplaListingListResponse) *zoopla.ListingListResponse {
+
+	var listings []*zoopla.Listing
+	for _, v := range resp.Listings {
+		listings = append(listings, &zoopla.Listing{ListingReference: v.ListingReference, ListingEtag: v.ListingEtag, URL: v.URL})
+	}
+
+	result := &zoopla.ListingListResponse{
+		Status:           resp.Status,
+		BranchReference:resp.BranchReference,
+		Listings: listings,
+	}
+
+	return result
+}
+
+func (server *serverImpl) Listing(ctx context.Context, request *zoopla.ListingListRequest) (*zoopla.ListingListResponse, error) {
 	if request == nil {
 		return nil, errs.NilRequest
 	}
-}
 
-func (server *serverImpl) GetProperty(context.Context, *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
-	panic("implement me")
-}
+	req, err := ToZooplaListingRequest(request)
 
-func (server *serverImpl) GetPropertyInfo(context.Context, *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
-	panic("implement me")
-}
-
-func (server *serverImpl) Example(ctx context.Context, request *zoopla.PropertyRequest) (*zoopla.PropertyResponse, error) {
-	if request == nil {
-		return nil, errs.NilRequest
+	resp, err := ListingListImpl(*req)
+	if err != nil {
+		return nil, err
 	}
-	return &zoopla.PropertyResponse{
-		Status: "Result of " + request.SomeField,
-	}, nil
+
+	result := GetListingListResponse(resp)
+	return result, nil
 }
+
+
 
 func (server *serverImpl) Background() {
 	// background processes

@@ -7,7 +7,6 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	grpc "google.golang.org/grpc"
 	math "math"
 )
@@ -23,544 +22,68 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type PropertyStatus int32
+type Pricing_TransactionType int32
 
 const (
-	PropertyStatus_UNKNOWN_STATUS                PropertyStatus = 0
-	PropertyStatus_ACTIVE                        PropertyStatus = 1
-	PropertyStatus_PENDING_LANDLORD_CONFIRMATION PropertyStatus = 2
+	Pricing_rent Pricing_TransactionType = 0
+	Pricing_sale Pricing_TransactionType = 1
 )
 
-var PropertyStatus_name = map[int32]string{
-	0: "UNKNOWN_STATUS",
-	1: "ACTIVE",
-	2: "PENDING_LANDLORD_CONFIRMATION",
+var Pricing_TransactionType_name = map[int32]string{
+	0: "rent",
+	1: "sale",
 }
 
-var PropertyStatus_value = map[string]int32{
-	"UNKNOWN_STATUS":                0,
-	"ACTIVE":                        1,
-	"PENDING_LANDLORD_CONFIRMATION": 2,
+var Pricing_TransactionType_value = map[string]int32{
+	"rent": 0,
+	"sale": 1,
 }
 
-func (x PropertyStatus) String() string {
-	return proto.EnumName(PropertyStatus_name, int32(x))
+func (x Pricing_TransactionType) String() string {
+	return proto.EnumName(Pricing_TransactionType_name, int32(x))
 }
 
-func (PropertyStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
+func (Pricing_TransactionType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{5, 0}
 }
 
-type PropertyType int32
+type Pricing_RentFrequency int32
 
 const (
-	PropertyType_UNKNOWN_TYPE   PropertyType = 0
-	PropertyType_STUDIO         PropertyType = 1
-	PropertyType_ONE_BEDROOM    PropertyType = 2
-	PropertyType_TWO_BEDROOMS   PropertyType = 3
-	PropertyType_THREE_BEDROOMS PropertyType = 4
-	PropertyType_FOUR_BEDROOMS  PropertyType = 5
+	Pricing_per_person_per_week Pricing_RentFrequency = 0
+	Pricing_per_week            Pricing_RentFrequency = 1
+	Pricing_per_month           Pricing_RentFrequency = 2
+	Pricing_per_quarter         Pricing_RentFrequency = 3
+	Pricing_per_year            Pricing_RentFrequency = 4
 )
 
-var PropertyType_name = map[int32]string{
-	0: "UNKNOWN_TYPE",
-	1: "STUDIO",
-	2: "ONE_BEDROOM",
-	3: "TWO_BEDROOMS",
-	4: "THREE_BEDROOMS",
-	5: "FOUR_BEDROOMS",
+var Pricing_RentFrequency_name = map[int32]string{
+	0: "per_person_per_week",
+	1: "per_week",
+	2: "per_month",
+	3: "per_quarter",
+	4: "per_year",
 }
 
-var PropertyType_value = map[string]int32{
-	"UNKNOWN_TYPE":   0,
-	"STUDIO":         1,
-	"ONE_BEDROOM":    2,
-	"TWO_BEDROOMS":   3,
-	"THREE_BEDROOMS": 4,
-	"FOUR_BEDROOMS":  5,
+var Pricing_RentFrequency_value = map[string]int32{
+	"per_person_per_week": 0,
+	"per_week":            1,
+	"per_month":           2,
+	"per_quarter":         3,
+	"per_year":            4,
 }
 
-func (x PropertyType) String() string {
-	return proto.EnumName(PropertyType_name, int32(x))
+func (x Pricing_RentFrequency) String() string {
+	return proto.EnumName(Pricing_RentFrequency_name, int32(x))
 }
 
-func (PropertyType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
-}
-
-type PropertyTaxBand int32
-
-const (
-	PropertyTaxBand_UNKNOWN_TAX_BAND PropertyTaxBand = 0
-	PropertyTaxBand_A                PropertyTaxBand = 1
-	PropertyTaxBand_B                PropertyTaxBand = 2
-	PropertyTaxBand_C                PropertyTaxBand = 3
-)
-
-var PropertyTaxBand_name = map[int32]string{
-	0: "UNKNOWN_TAX_BAND",
-	1: "A",
-	2: "B",
-	3: "C",
-}
-
-var PropertyTaxBand_value = map[string]int32{
-	"UNKNOWN_TAX_BAND": 0,
-	"A":                1,
-	"B":                2,
-	"C":                3,
-}
-
-func (x PropertyTaxBand) String() string {
-	return proto.EnumName(PropertyTaxBand_name, int32(x))
-}
-
-func (PropertyTaxBand) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
-}
-
-type PropertyAvailabilityType int32
-
-const (
-	PropertyAvailabilityType_UNKNOWN_AVAILABILITY PropertyAvailabilityType = 0
-	PropertyAvailabilityType_WHOLE_DAY            PropertyAvailabilityType = 1
-	PropertyAvailabilityType_TIME_SPAN            PropertyAvailabilityType = 2
-)
-
-var PropertyAvailabilityType_name = map[int32]string{
-	0: "UNKNOWN_AVAILABILITY",
-	1: "WHOLE_DAY",
-	2: "TIME_SPAN",
-}
-
-var PropertyAvailabilityType_value = map[string]int32{
-	"UNKNOWN_AVAILABILITY": 0,
-	"WHOLE_DAY":            1,
-	"TIME_SPAN":            2,
-}
-
-func (x PropertyAvailabilityType) String() string {
-	return proto.EnumName(PropertyAvailabilityType_name, int32(x))
-}
-
-func (PropertyAvailabilityType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
-}
-
-type PropertyAvailabilitySlot struct {
-	WeekDay              int32                    `protobuf:"varint,1,opt,name=week_day,json=weekDay,proto3" json:"week_day,omitempty"`
-	TimeStart            int32                    `protobuf:"varint,2,opt,name=time_start,json=timeStart,proto3" json:"time_start,omitempty"`
-	TimeEnd              int32                    `protobuf:"varint,3,opt,name=time_end,json=timeEnd,proto3" json:"time_end,omitempty"`
-	Type                 PropertyAvailabilityType `protobuf:"varint,4,opt,name=type,proto3,enum=mashroom.zoopla.PropertyAvailabilityType" json:"type,omitempty"`
-	Day                  int32                    `protobuf:"varint,5,opt,name=day,proto3" json:"day,omitempty"`
-	Month                int32                    `protobuf:"varint,6,opt,name=month,proto3" json:"month,omitempty"`
-	Year                 int32                    `protobuf:"varint,7,opt,name=year,proto3" json:"year,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
-}
-
-func (m *PropertyAvailabilitySlot) Reset()         { *m = PropertyAvailabilitySlot{} }
-func (m *PropertyAvailabilitySlot) String() string { return proto.CompactTextString(m) }
-func (*PropertyAvailabilitySlot) ProtoMessage()    {}
-func (*PropertyAvailabilitySlot) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
-}
-
-func (m *PropertyAvailabilitySlot) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PropertyAvailabilitySlot.Unmarshal(m, b)
-}
-func (m *PropertyAvailabilitySlot) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PropertyAvailabilitySlot.Marshal(b, m, deterministic)
-}
-func (m *PropertyAvailabilitySlot) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PropertyAvailabilitySlot.Merge(m, src)
-}
-func (m *PropertyAvailabilitySlot) XXX_Size() int {
-	return xxx_messageInfo_PropertyAvailabilitySlot.Size(m)
-}
-func (m *PropertyAvailabilitySlot) XXX_DiscardUnknown() {
-	xxx_messageInfo_PropertyAvailabilitySlot.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PropertyAvailabilitySlot proto.InternalMessageInfo
-
-func (m *PropertyAvailabilitySlot) GetWeekDay() int32 {
-	if m != nil {
-		return m.WeekDay
-	}
-	return 0
-}
-
-func (m *PropertyAvailabilitySlot) GetTimeStart() int32 {
-	if m != nil {
-		return m.TimeStart
-	}
-	return 0
-}
-
-func (m *PropertyAvailabilitySlot) GetTimeEnd() int32 {
-	if m != nil {
-		return m.TimeEnd
-	}
-	return 0
-}
-
-func (m *PropertyAvailabilitySlot) GetType() PropertyAvailabilityType {
-	if m != nil {
-		return m.Type
-	}
-	return PropertyAvailabilityType_UNKNOWN_AVAILABILITY
-}
-
-func (m *PropertyAvailabilitySlot) GetDay() int32 {
-	if m != nil {
-		return m.Day
-	}
-	return 0
-}
-
-func (m *PropertyAvailabilitySlot) GetMonth() int32 {
-	if m != nil {
-		return m.Month
-	}
-	return 0
-}
-
-func (m *PropertyAvailabilitySlot) GetYear() int32 {
-	if m != nil {
-		return m.Year
-	}
-	return 0
-}
-
-type PropertyLocation struct {
-	Longitude            float64  `protobuf:"fixed64,1,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Latitude             float64  `protobuf:"fixed64,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PropertyLocation) Reset()         { *m = PropertyLocation{} }
-func (m *PropertyLocation) String() string { return proto.CompactTextString(m) }
-func (*PropertyLocation) ProtoMessage()    {}
-func (*PropertyLocation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
-}
-
-func (m *PropertyLocation) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PropertyLocation.Unmarshal(m, b)
-}
-func (m *PropertyLocation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PropertyLocation.Marshal(b, m, deterministic)
-}
-func (m *PropertyLocation) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PropertyLocation.Merge(m, src)
-}
-func (m *PropertyLocation) XXX_Size() int {
-	return xxx_messageInfo_PropertyLocation.Size(m)
-}
-func (m *PropertyLocation) XXX_DiscardUnknown() {
-	xxx_messageInfo_PropertyLocation.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PropertyLocation proto.InternalMessageInfo
-
-func (m *PropertyLocation) GetLongitude() float64 {
-	if m != nil {
-		return m.Longitude
-	}
-	return 0
-}
-
-func (m *PropertyLocation) GetLatitude() float64 {
-	if m != nil {
-		return m.Latitude
-	}
-	return 0
-}
-
-type Property struct {
-	Id                   string                      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	City                 *wrappers.StringValue       `protobuf:"bytes,2,opt,name=city,proto3" json:"city,omitempty"`
-	Address              *wrappers.StringValue       `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	Postcode             *wrappers.StringValue       `protobuf:"bytes,4,opt,name=postcode,proto3" json:"postcode,omitempty"`
-	CountryCode          *wrappers.StringValue       `protobuf:"bytes,5,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`
-	BuildingId           *wrappers.StringValue       `protobuf:"bytes,6,opt,name=building_id,json=buildingId,proto3" json:"building_id,omitempty"`
-	LandlordId           *wrappers.StringValue       `protobuf:"bytes,7,opt,name=landlord_id,json=landlordId,proto3" json:"landlord_id,omitempty"`
-	SubmitterId          *wrappers.StringValue       `protobuf:"bytes,8,opt,name=submitter_id,json=submitterId,proto3" json:"submitter_id,omitempty"`
-	TenantIds            []string                    `protobuf:"bytes,9,rep,name=tenant_ids,json=tenantIds,proto3" json:"tenant_ids,omitempty"`
-	ThreadId             *wrappers.StringValue       `protobuf:"bytes,10,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	CreatedAt            *wrappers.Int64Value        `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Status               PropertyStatus              `protobuf:"varint,12,opt,name=status,proto3,enum=mashroom.zoopla.PropertyStatus" json:"status,omitempty"`
-	Type                 PropertyType                `protobuf:"varint,13,opt,name=type,proto3,enum=mashroom.zoopla.PropertyType" json:"type,omitempty"`
-	Sqm                  *wrappers.DoubleValue       `protobuf:"bytes,14,opt,name=sqm,proto3" json:"sqm,omitempty"`
-	UkTaxBand            PropertyTaxBand             `protobuf:"varint,15,opt,name=uk_tax_band,json=ukTaxBand,proto3,enum=mashroom.zoopla.PropertyTaxBand" json:"uk_tax_band,omitempty"`
-	Tags                 []string                    `protobuf:"bytes,16,rep,name=tags,proto3" json:"tags,omitempty"`
-	StartedListingAt     *wrappers.Int64Value        `protobuf:"bytes,17,opt,name=started_listing_at,json=startedListingAt,proto3" json:"started_listing_at,omitempty"`
-	EndedListingAt       *wrappers.Int64Value        `protobuf:"bytes,18,opt,name=ended_listing_at,json=endedListingAt,proto3" json:"ended_listing_at,omitempty"`
-	Availability         []*PropertyAvailabilitySlot `protobuf:"bytes,19,rep,name=availability,proto3" json:"availability,omitempty"`
-	Imageb64             *wrappers.StringValue       `protobuf:"bytes,20,opt,name=imageb64,proto3" json:"imageb64,omitempty"`
-	Location             *PropertyLocation           `protobuf:"bytes,21,opt,name=location,proto3" json:"location,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
-	XXX_unrecognized     []byte                      `json:"-"`
-	XXX_sizecache        int32                       `json:"-"`
-}
-
-func (m *Property) Reset()         { *m = Property{} }
-func (m *Property) String() string { return proto.CompactTextString(m) }
-func (*Property) ProtoMessage()    {}
-func (*Property) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
-}
-
-func (m *Property) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Property.Unmarshal(m, b)
-}
-func (m *Property) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Property.Marshal(b, m, deterministic)
-}
-func (m *Property) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Property.Merge(m, src)
-}
-func (m *Property) XXX_Size() int {
-	return xxx_messageInfo_Property.Size(m)
-}
-func (m *Property) XXX_DiscardUnknown() {
-	xxx_messageInfo_Property.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Property proto.InternalMessageInfo
-
-func (m *Property) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-func (m *Property) GetCity() *wrappers.StringValue {
-	if m != nil {
-		return m.City
-	}
-	return nil
-}
-
-func (m *Property) GetAddress() *wrappers.StringValue {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
-
-func (m *Property) GetPostcode() *wrappers.StringValue {
-	if m != nil {
-		return m.Postcode
-	}
-	return nil
-}
-
-func (m *Property) GetCountryCode() *wrappers.StringValue {
-	if m != nil {
-		return m.CountryCode
-	}
-	return nil
-}
-
-func (m *Property) GetBuildingId() *wrappers.StringValue {
-	if m != nil {
-		return m.BuildingId
-	}
-	return nil
-}
-
-func (m *Property) GetLandlordId() *wrappers.StringValue {
-	if m != nil {
-		return m.LandlordId
-	}
-	return nil
-}
-
-func (m *Property) GetSubmitterId() *wrappers.StringValue {
-	if m != nil {
-		return m.SubmitterId
-	}
-	return nil
-}
-
-func (m *Property) GetTenantIds() []string {
-	if m != nil {
-		return m.TenantIds
-	}
-	return nil
-}
-
-func (m *Property) GetThreadId() *wrappers.StringValue {
-	if m != nil {
-		return m.ThreadId
-	}
-	return nil
-}
-
-func (m *Property) GetCreatedAt() *wrappers.Int64Value {
-	if m != nil {
-		return m.CreatedAt
-	}
-	return nil
-}
-
-func (m *Property) GetStatus() PropertyStatus {
-	if m != nil {
-		return m.Status
-	}
-	return PropertyStatus_UNKNOWN_STATUS
-}
-
-func (m *Property) GetType() PropertyType {
-	if m != nil {
-		return m.Type
-	}
-	return PropertyType_UNKNOWN_TYPE
-}
-
-func (m *Property) GetSqm() *wrappers.DoubleValue {
-	if m != nil {
-		return m.Sqm
-	}
-	return nil
-}
-
-func (m *Property) GetUkTaxBand() PropertyTaxBand {
-	if m != nil {
-		return m.UkTaxBand
-	}
-	return PropertyTaxBand_UNKNOWN_TAX_BAND
-}
-
-func (m *Property) GetTags() []string {
-	if m != nil {
-		return m.Tags
-	}
-	return nil
-}
-
-func (m *Property) GetStartedListingAt() *wrappers.Int64Value {
-	if m != nil {
-		return m.StartedListingAt
-	}
-	return nil
-}
-
-func (m *Property) GetEndedListingAt() *wrappers.Int64Value {
-	if m != nil {
-		return m.EndedListingAt
-	}
-	return nil
-}
-
-func (m *Property) GetAvailability() []*PropertyAvailabilitySlot {
-	if m != nil {
-		return m.Availability
-	}
-	return nil
-}
-
-func (m *Property) GetImageb64() *wrappers.StringValue {
-	if m != nil {
-		return m.Imageb64
-	}
-	return nil
-}
-
-func (m *Property) GetLocation() *PropertyLocation {
-	if m != nil {
-		return m.Location
-	}
-	return nil
-}
-
-type PropertyRequest struct {
-	SomeField            string   `protobuf:"bytes,1,opt,name=some_field,json=someField,proto3" json:"some_field,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PropertyRequest) Reset()         { *m = PropertyRequest{} }
-func (m *PropertyRequest) String() string { return proto.CompactTextString(m) }
-func (*PropertyRequest) ProtoMessage()    {}
-func (*PropertyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
-}
-
-func (m *PropertyRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PropertyRequest.Unmarshal(m, b)
-}
-func (m *PropertyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PropertyRequest.Marshal(b, m, deterministic)
-}
-func (m *PropertyRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PropertyRequest.Merge(m, src)
-}
-func (m *PropertyRequest) XXX_Size() int {
-	return xxx_messageInfo_PropertyRequest.Size(m)
-}
-func (m *PropertyRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_PropertyRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PropertyRequest proto.InternalMessageInfo
-
-func (m *PropertyRequest) GetSomeField() string {
-	if m != nil {
-		return m.SomeField
-	}
-	return ""
-}
-
-type PropertyResponse struct {
-	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PropertyResponse) Reset()         { *m = PropertyResponse{} }
-func (m *PropertyResponse) String() string { return proto.CompactTextString(m) }
-func (*PropertyResponse) ProtoMessage()    {}
-func (*PropertyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{4}
-}
-
-func (m *PropertyResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PropertyResponse.Unmarshal(m, b)
-}
-func (m *PropertyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PropertyResponse.Marshal(b, m, deterministic)
-}
-func (m *PropertyResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PropertyResponse.Merge(m, src)
-}
-func (m *PropertyResponse) XXX_Size() int {
-	return xxx_messageInfo_PropertyResponse.Size(m)
-}
-func (m *PropertyResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_PropertyResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PropertyResponse proto.InternalMessageInfo
-
-func (m *PropertyResponse) GetStatus() string {
-	if m != nil {
-		return m.Status
-	}
-	return ""
+func (Pricing_RentFrequency) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{5, 1}
 }
 
 type Coordinates struct {
-	Latitude             float64  `protobuf:"fixed64,1,opt,name=Latitude,json=latitude,proto3" json:"Latitude,omitempty"`
-	Longitude            float64  `protobuf:"fixed64,2,opt,name=Longitude,json=longitude,proto3" json:"Longitude,omitempty"`
+	Latitude             float64  `protobuf:"fixed64,1,opt,name=Latitude,proto3" json:"Latitude,omitempty"`
+	Longitude            float64  `protobuf:"fixed64,2,opt,name=Longitude,proto3" json:"Longitude,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -570,7 +93,7 @@ func (m *Coordinates) Reset()         { *m = Coordinates{} }
 func (m *Coordinates) String() string { return proto.CompactTextString(m) }
 func (*Coordinates) ProtoMessage()    {}
 func (*Coordinates) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{5}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{0}
 }
 
 func (m *Coordinates) XXX_Unmarshal(b []byte) error {
@@ -606,9 +129,9 @@ func (m *Coordinates) GetLongitude() float64 {
 }
 
 type PafAddress struct {
-	AddressKey           string   `protobuf:"bytes,1,opt,name=AddressKey,json=addressKey,proto3" json:"AddressKey,omitempty"`
-	OrganisationKey      string   `protobuf:"bytes,2,opt,name=OrganisationKey,json=organisationKey,proto3" json:"OrganisationKey,omitempty"`
-	PostcodeType         string   `protobuf:"bytes,3,opt,name=PostcodeType,json=postcodeType,proto3" json:"PostcodeType,omitempty"`
+	AddressKey           string   `protobuf:"bytes,1,opt,name=AddressKey,proto3" json:"AddressKey,omitempty"`
+	OrganisationKey      string   `protobuf:"bytes,2,opt,name=OrganisationKey,proto3" json:"OrganisationKey,omitempty"`
+	PostcodeType         string   `protobuf:"bytes,3,opt,name=PostcodeType,proto3" json:"PostcodeType,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -618,7 +141,7 @@ func (m *PafAddress) Reset()         { *m = PafAddress{} }
 func (m *PafAddress) String() string { return proto.CompactTextString(m) }
 func (*PafAddress) ProtoMessage()    {}
 func (*PafAddress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{6}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{1}
 }
 
 func (m *PafAddress) XXX_Unmarshal(b []byte) error {
@@ -661,16 +184,12 @@ func (m *PafAddress) GetPostcodeType() string {
 }
 
 type Location struct {
-	CountryCode          string       `protobuf:"bytes,1,opt,name=CountryCode,json=countryCode,proto3" json:"CountryCode,omitempty"`
-	County               string       `protobuf:"bytes,2,opt,name=County,json=county,proto3" json:"County,omitempty"`
-	Locality             string       `protobuf:"bytes,3,opt,name=Locality,json=locality,proto3" json:"Locality,omitempty"`
-	PafUdprn             string       `protobuf:"bytes,4,opt,name=PafUdprn,json=pafUdprn,proto3" json:"PafUdprn,omitempty"`
-	PostalCode           string       `protobuf:"bytes,5,opt,name=PostalCode,json=postalCode,proto3" json:"PostalCode,omitempty"`
-	PropertyNumberOrName string       `protobuf:"bytes,6,opt,name=PropertyNumberOrName,json=propertyNumberOrName,proto3" json:"PropertyNumberOrName,omitempty"`
-	StreetName           string       `protobuf:"bytes,7,opt,name=StreetName,json=streetName,proto3" json:"StreetName,omitempty"`
-	TownOrCity           string       `protobuf:"bytes,8,opt,name=TownOrCity,json=townOrCity,proto3" json:"TownOrCity,omitempty"`
-	Coordinates          *Coordinates `protobuf:"bytes,9,opt,name=Coordinates,json=coordinates,proto3" json:"Coordinates,omitempty"`
-	PafAddress           *PafAddress  `protobuf:"bytes,10,opt,name=PafAddress,json=pafAddress,proto3" json:"PafAddress,omitempty"`
+	CountryCode          string       `protobuf:"bytes,1,opt,name=CountryCode,proto3" json:"CountryCode,omitempty"`
+	PostalCode           string       `protobuf:"bytes,2,opt,name=PostalCode,proto3" json:"PostalCode,omitempty"`
+	PropertyNumberOrName string       `protobuf:"bytes,3,opt,name=PropertyNumberOrName,proto3" json:"PropertyNumberOrName,omitempty"`
+	StreetName           string       `protobuf:"bytes,4,opt,name=StreetName,proto3" json:"StreetName,omitempty"`
+	TownOrCity           string       `protobuf:"bytes,5,opt,name=TownOrCity,proto3" json:"TownOrCity,omitempty"`
+	Coordinates          *Coordinates `protobuf:"bytes,6,opt,name=Coordinates,proto3" json:"Coordinates,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`
 	XXX_sizecache        int32        `json:"-"`
@@ -680,7 +199,7 @@ func (m *Location) Reset()         { *m = Location{} }
 func (m *Location) String() string { return proto.CompactTextString(m) }
 func (*Location) ProtoMessage()    {}
 func (*Location) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{7}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{2}
 }
 
 func (m *Location) XXX_Unmarshal(b []byte) error {
@@ -704,27 +223,6 @@ var xxx_messageInfo_Location proto.InternalMessageInfo
 func (m *Location) GetCountryCode() string {
 	if m != nil {
 		return m.CountryCode
-	}
-	return ""
-}
-
-func (m *Location) GetCounty() string {
-	if m != nil {
-		return m.County
-	}
-	return ""
-}
-
-func (m *Location) GetLocality() string {
-	if m != nil {
-		return m.Locality
-	}
-	return ""
-}
-
-func (m *Location) GetPafUdprn() string {
-	if m != nil {
-		return m.PafUdprn
 	}
 	return ""
 }
@@ -764,17 +262,10 @@ func (m *Location) GetCoordinates() *Coordinates {
 	return nil
 }
 
-func (m *Location) GetPafAddress() *PafAddress {
-	if m != nil {
-		return m.PafAddress
-	}
-	return nil
-}
-
 type DetailedDescription struct {
-	Dimensions           string   `protobuf:"bytes,1,opt,name=Dimensions,json=dimensions,proto3" json:"Dimensions,omitempty"`
-	Heading              string   `protobuf:"bytes,2,opt,name=Heading,json=heading,proto3" json:"Heading,omitempty"`
-	Text                 string   `protobuf:"bytes,3,opt,name=Text,json=text,proto3" json:"Text,omitempty"`
+	Dimensions           string   `protobuf:"bytes,1,opt,name=Dimensions,proto3" json:"Dimensions,omitempty"`
+	Heading              string   `protobuf:"bytes,2,opt,name=Heading,proto3" json:"Heading,omitempty"`
+	Text                 string   `protobuf:"bytes,3,opt,name=Text,proto3" json:"Text,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -784,7 +275,7 @@ func (m *DetailedDescription) Reset()         { *m = DetailedDescription{} }
 func (m *DetailedDescription) String() string { return proto.CompactTextString(m) }
 func (*DetailedDescription) ProtoMessage()    {}
 func (*DetailedDescription) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{8}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{3}
 }
 
 func (m *DetailedDescription) XXX_Unmarshal(b []byte) error {
@@ -827,8 +318,8 @@ func (m *DetailedDescription) GetText() string {
 }
 
 type PricePerUnitArea struct {
-	Price                float64  `protobuf:"fixed64,1,opt,name=Price,json=price,proto3" json:"Price,omitempty"`
-	Units                string   `protobuf:"bytes,2,opt,name=Units,json=units,proto3" json:"Units,omitempty"`
+	Price                float64  `protobuf:"fixed64,1,opt,name=Price,proto3" json:"Price,omitempty"`
+	Units                string   `protobuf:"bytes,2,opt,name=Units,proto3" json:"Units,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -838,7 +329,7 @@ func (m *PricePerUnitArea) Reset()         { *m = PricePerUnitArea{} }
 func (m *PricePerUnitArea) String() string { return proto.CompactTextString(m) }
 func (*PricePerUnitArea) ProtoMessage()    {}
 func (*PricePerUnitArea) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{9}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{4}
 }
 
 func (m *PricePerUnitArea) XXX_Unmarshal(b []byte) error {
@@ -873,165 +364,21 @@ func (m *PricePerUnitArea) GetUnits() string {
 	return ""
 }
 
-type Area struct {
-	Units                string   `protobuf:"bytes,1,opt,name=Units,json=units,proto3" json:"Units,omitempty"`
-	Value                float64  `protobuf:"fixed64,2,opt,name=Value,json=value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Area) Reset()         { *m = Area{} }
-func (m *Area) String() string { return proto.CompactTextString(m) }
-func (*Area) ProtoMessage()    {}
-func (*Area) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{10}
-}
-
-func (m *Area) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Area.Unmarshal(m, b)
-}
-func (m *Area) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Area.Marshal(b, m, deterministic)
-}
-func (m *Area) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Area.Merge(m, src)
-}
-func (m *Area) XXX_Size() int {
-	return xxx_messageInfo_Area.Size(m)
-}
-func (m *Area) XXX_DiscardUnknown() {
-	xxx_messageInfo_Area.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Area proto.InternalMessageInfo
-
-func (m *Area) GetUnits() string {
-	if m != nil {
-		return m.Units
-	}
-	return ""
-}
-
-func (m *Area) GetValue() float64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type MinMaxArea struct {
-	Maximum              *Area    `protobuf:"bytes,1,opt,name=Maximum,json=maximum,proto3" json:"Maximum,omitempty"`
-	Minimum              *Area    `protobuf:"bytes,2,opt,name=Minimum,json=minimum,proto3" json:"Minimum,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *MinMaxArea) Reset()         { *m = MinMaxArea{} }
-func (m *MinMaxArea) String() string { return proto.CompactTextString(m) }
-func (*MinMaxArea) ProtoMessage()    {}
-func (*MinMaxArea) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{11}
-}
-
-func (m *MinMaxArea) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MinMaxArea.Unmarshal(m, b)
-}
-func (m *MinMaxArea) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MinMaxArea.Marshal(b, m, deterministic)
-}
-func (m *MinMaxArea) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MinMaxArea.Merge(m, src)
-}
-func (m *MinMaxArea) XXX_Size() int {
-	return xxx_messageInfo_MinMaxArea.Size(m)
-}
-func (m *MinMaxArea) XXX_DiscardUnknown() {
-	xxx_messageInfo_MinMaxArea.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MinMaxArea proto.InternalMessageInfo
-
-func (m *MinMaxArea) GetMaximum() *Area {
-	if m != nil {
-		return m.Maximum
-	}
-	return nil
-}
-
-func (m *MinMaxArea) GetMinimum() *Area {
-	if m != nil {
-		return m.Minimum
-	}
-	return nil
-}
-
-type Areas struct {
-	External             *MinMaxArea `protobuf:"bytes,1,opt,name=External,json=external,proto3" json:"External,omitempty"`
-	Internal             *MinMaxArea `protobuf:"bytes,2,opt,name=Internal,json=internal,proto3" json:"Internal,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
-}
-
-func (m *Areas) Reset()         { *m = Areas{} }
-func (m *Areas) String() string { return proto.CompactTextString(m) }
-func (*Areas) ProtoMessage()    {}
-func (*Areas) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{12}
-}
-
-func (m *Areas) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Areas.Unmarshal(m, b)
-}
-func (m *Areas) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Areas.Marshal(b, m, deterministic)
-}
-func (m *Areas) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Areas.Merge(m, src)
-}
-func (m *Areas) XXX_Size() int {
-	return xxx_messageInfo_Areas.Size(m)
-}
-func (m *Areas) XXX_DiscardUnknown() {
-	xxx_messageInfo_Areas.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Areas proto.InternalMessageInfo
-
-func (m *Areas) GetExternal() *MinMaxArea {
-	if m != nil {
-		return m.External
-	}
-	return nil
-}
-
-func (m *Areas) GetInternal() *MinMaxArea {
-	if m != nil {
-		return m.Internal
-	}
-	return nil
-}
-
 type Pricing struct {
-	Auction              bool              `protobuf:"varint,1,opt,name=Auction,json=auction,proto3" json:"Auction,omitempty"`
-	CurrencyCode         string            `protobuf:"bytes,2,opt,name=CurrencyCode,json=currencyCode,proto3" json:"CurrencyCode,omitempty"`
-	Price                float64           `protobuf:"fixed64,3,opt,name=Price,json=price,proto3" json:"Price,omitempty"`
-	PricePerUnitArea     *PricePerUnitArea `protobuf:"bytes,4,opt,name=PricePerUnitArea,json=pricePerUnitArea,proto3" json:"PricePerUnitArea,omitempty"`
-	PriceQualifier       string            `protobuf:"bytes,5,opt,name=PriceQualifier,json=priceQualifier,proto3" json:"PriceQualifier,omitempty"`
-	RentFrequency        string            `protobuf:"bytes,6,opt,name=RentFrequency,json=rentFrequency,proto3" json:"RentFrequency,omitempty"`
-	TransactionType      string            `protobuf:"bytes,7,opt,name=TransactionType,json=transactionType,proto3" json:"TransactionType,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	TransactionType      Pricing_TransactionType `protobuf:"varint,1,opt,name=transactionType,proto3,enum=mashroom.zoopla.Pricing_TransactionType" json:"transactionType,omitempty"`
+	CurrencyCode         string                  `protobuf:"bytes,2,opt,name=CurrencyCode,proto3" json:"CurrencyCode,omitempty"`
+	Price                float64                 `protobuf:"fixed64,3,opt,name=Price,proto3" json:"Price,omitempty"`
+	RentFrequency        Pricing_RentFrequency   `protobuf:"varint,4,opt,name=rentFrequency,proto3,enum=mashroom.zoopla.Pricing_RentFrequency" json:"rentFrequency,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
 }
 
 func (m *Pricing) Reset()         { *m = Pricing{} }
 func (m *Pricing) String() string { return proto.CompactTextString(m) }
 func (*Pricing) ProtoMessage()    {}
 func (*Pricing) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{13}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{5}
 }
 
 func (m *Pricing) XXX_Unmarshal(b []byte) error {
@@ -1052,11 +399,11 @@ func (m *Pricing) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Pricing proto.InternalMessageInfo
 
-func (m *Pricing) GetAuction() bool {
+func (m *Pricing) GetTransactionType() Pricing_TransactionType {
 	if m != nil {
-		return m.Auction
+		return m.TransactionType
 	}
-	return false
+	return Pricing_rent
 }
 
 func (m *Pricing) GetCurrencyCode() string {
@@ -1073,32 +420,11 @@ func (m *Pricing) GetPrice() float64 {
 	return 0
 }
 
-func (m *Pricing) GetPricePerUnitArea() *PricePerUnitArea {
-	if m != nil {
-		return m.PricePerUnitArea
-	}
-	return nil
-}
-
-func (m *Pricing) GetPriceQualifier() string {
-	if m != nil {
-		return m.PriceQualifier
-	}
-	return ""
-}
-
-func (m *Pricing) GetRentFrequency() string {
+func (m *Pricing) GetRentFrequency() Pricing_RentFrequency {
 	if m != nil {
 		return m.RentFrequency
 	}
-	return ""
-}
-
-func (m *Pricing) GetTransactionType() string {
-	if m != nil {
-		return m.TransactionType
-	}
-	return ""
+	return Pricing_per_person_per_week
 }
 
 type BranchUpdateRequest struct {
@@ -1111,7 +437,7 @@ func (m *BranchUpdateRequest) Reset()         { *m = BranchUpdateRequest{} }
 func (m *BranchUpdateRequest) String() string { return proto.CompactTextString(m) }
 func (*BranchUpdateRequest) ProtoMessage()    {}
 func (*BranchUpdateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{14}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{6}
 }
 
 func (m *BranchUpdateRequest) XXX_Unmarshal(b []byte) error {
@@ -1145,7 +471,7 @@ func (m *BranchUpdateResponse) Reset()         { *m = BranchUpdateResponse{} }
 func (m *BranchUpdateResponse) String() string { return proto.CompactTextString(m) }
 func (*BranchUpdateResponse) ProtoMessage()    {}
 func (*BranchUpdateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{15}
+	return fileDescriptor_00212fb1f9d3bf1c, []int{7}
 }
 
 func (m *BranchUpdateResponse) XXX_Unmarshal(b []byte) error {
@@ -1187,166 +513,102 @@ func (m *BranchUpdateResponse) GetNewBranch() bool {
 	return false
 }
 
-type ListUpdateRequest struct {
-	BranchReference      string                 `protobuf:"bytes,1,opt,name=BranchReference,json=branchReference,proto3" json:"BranchReference,omitempty"`
-	Category             string                 `protobuf:"bytes,2,opt,name=Category,json=category,proto3" json:"Category,omitempty"`
-	ListingReference     string                 `protobuf:"bytes,3,opt,name=ListingReference,json=listingReference,proto3" json:"ListingReference,omitempty"`
-	Location             *Location              `protobuf:"bytes,4,opt,name=Location,json=location,proto3" json:"Location,omitempty"`
-	Pricing              *Pricing               `protobuf:"bytes,5,opt,name=Pricing,json=pricing,proto3" json:"Pricing,omitempty"`
-	PropertyType         string                 `protobuf:"bytes,6,opt,name=PropertyType,json=propertyType,proto3" json:"PropertyType,omitempty"`
-	Areas                *Areas                 `protobuf:"bytes,7,opt,name=Areas,json=areas,proto3" json:"Areas,omitempty"`
-	BillsIncluded        []string               `protobuf:"bytes,8,rep,name=BillsIncluded,json=billsIncluded,proto3" json:"BillsIncluded,omitempty"`
-	DetailedDescription  []*DetailedDescription `protobuf:"bytes,9,rep,name=DetailedDescription,json=detailedDescription,proto3" json:"DetailedDescription,omitempty"`
-	FurnishedState       string                 `protobuf:"bytes,10,opt,name=FurnishedState,json=furnishedState,proto3" json:"FurnishedState,omitempty"`
-	LifeCycleStatus      string                 `protobuf:"bytes,11,opt,name=LifeCycleStatus,json=lifeCycleStatus,proto3" json:"LifeCycleStatus,omitempty"`
-	AvailableFromDate    string                 `protobuf:"bytes,12,opt,name=AvailableFromDate,json=availableFromDate,proto3" json:"AvailableFromDate,omitempty"`
-	Bathrooms            int32                  `protobuf:"varint,13,opt,name=Bathrooms,json=bathrooms,proto3" json:"Bathrooms,omitempty"`
-	DisplayAddress       string                 `protobuf:"bytes,14,opt,name=DisplayAddress,json=displayAddress,proto3" json:"DisplayAddress,omitempty"`
-	RentalTerm           string                 `protobuf:"bytes,15,opt,name=RentalTerm,json=rentalTerm,proto3" json:"RentalTerm,omitempty"`
-	TotalBedrooms        int32                  `protobuf:"varint,16,opt,name=TotalBedrooms,json=totalBedrooms,proto3" json:"TotalBedrooms,omitempty"`
+type ListingUpdateRequest struct {
+	BranchReference      string                 `protobuf:"bytes,1,opt,name=BranchReference,proto3" json:"BranchReference,omitempty"`
+	Category             string                 `protobuf:"bytes,2,opt,name=Category,proto3" json:"Category,omitempty"`
+	DetailedDescription  []*DetailedDescription `protobuf:"bytes,3,rep,name=DetailedDescription,proto3" json:"DetailedDescription,omitempty"`
+	LifeCycleStatus      string                 `protobuf:"bytes,4,opt,name=LifeCycleStatus,proto3" json:"LifeCycleStatus,omitempty"`
+	ListingReference     string                 `protobuf:"bytes,5,opt,name=ListingReference,proto3" json:"ListingReference,omitempty"`
+	Location             *Location              `protobuf:"bytes,6,opt,name=Location,proto3" json:"Location,omitempty"`
+	Pricing              *Pricing               `protobuf:"bytes,7,opt,name=Pricing,proto3" json:"Pricing,omitempty"`
+	PropertyType         string                 `protobuf:"bytes,8,opt,name=PropertyType,proto3" json:"PropertyType,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_unrecognized     []byte                 `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
 }
 
-func (m *ListUpdateRequest) Reset()         { *m = ListUpdateRequest{} }
-func (m *ListUpdateRequest) String() string { return proto.CompactTextString(m) }
-func (*ListUpdateRequest) ProtoMessage()    {}
-func (*ListUpdateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{16}
+func (m *ListingUpdateRequest) Reset()         { *m = ListingUpdateRequest{} }
+func (m *ListingUpdateRequest) String() string { return proto.CompactTextString(m) }
+func (*ListingUpdateRequest) ProtoMessage()    {}
+func (*ListingUpdateRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{8}
 }
 
-func (m *ListUpdateRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListUpdateRequest.Unmarshal(m, b)
+func (m *ListingUpdateRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListingUpdateRequest.Unmarshal(m, b)
 }
-func (m *ListUpdateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListUpdateRequest.Marshal(b, m, deterministic)
+func (m *ListingUpdateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListingUpdateRequest.Marshal(b, m, deterministic)
 }
-func (m *ListUpdateRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListUpdateRequest.Merge(m, src)
+func (m *ListingUpdateRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListingUpdateRequest.Merge(m, src)
 }
-func (m *ListUpdateRequest) XXX_Size() int {
-	return xxx_messageInfo_ListUpdateRequest.Size(m)
+func (m *ListingUpdateRequest) XXX_Size() int {
+	return xxx_messageInfo_ListingUpdateRequest.Size(m)
 }
-func (m *ListUpdateRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListUpdateRequest.DiscardUnknown(m)
+func (m *ListingUpdateRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListingUpdateRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ListUpdateRequest proto.InternalMessageInfo
+var xxx_messageInfo_ListingUpdateRequest proto.InternalMessageInfo
 
-func (m *ListUpdateRequest) GetBranchReference() string {
+func (m *ListingUpdateRequest) GetBranchReference() string {
 	if m != nil {
 		return m.BranchReference
 	}
 	return ""
 }
 
-func (m *ListUpdateRequest) GetCategory() string {
+func (m *ListingUpdateRequest) GetCategory() string {
 	if m != nil {
 		return m.Category
 	}
 	return ""
 }
 
-func (m *ListUpdateRequest) GetListingReference() string {
-	if m != nil {
-		return m.ListingReference
-	}
-	return ""
-}
-
-func (m *ListUpdateRequest) GetLocation() *Location {
-	if m != nil {
-		return m.Location
-	}
-	return nil
-}
-
-func (m *ListUpdateRequest) GetPricing() *Pricing {
-	if m != nil {
-		return m.Pricing
-	}
-	return nil
-}
-
-func (m *ListUpdateRequest) GetPropertyType() string {
-	if m != nil {
-		return m.PropertyType
-	}
-	return ""
-}
-
-func (m *ListUpdateRequest) GetAreas() *Areas {
-	if m != nil {
-		return m.Areas
-	}
-	return nil
-}
-
-func (m *ListUpdateRequest) GetBillsIncluded() []string {
-	if m != nil {
-		return m.BillsIncluded
-	}
-	return nil
-}
-
-func (m *ListUpdateRequest) GetDetailedDescription() []*DetailedDescription {
+func (m *ListingUpdateRequest) GetDetailedDescription() []*DetailedDescription {
 	if m != nil {
 		return m.DetailedDescription
 	}
 	return nil
 }
 
-func (m *ListUpdateRequest) GetFurnishedState() string {
-	if m != nil {
-		return m.FurnishedState
-	}
-	return ""
-}
-
-func (m *ListUpdateRequest) GetLifeCycleStatus() string {
+func (m *ListingUpdateRequest) GetLifeCycleStatus() string {
 	if m != nil {
 		return m.LifeCycleStatus
 	}
 	return ""
 }
 
-func (m *ListUpdateRequest) GetAvailableFromDate() string {
+func (m *ListingUpdateRequest) GetListingReference() string {
 	if m != nil {
-		return m.AvailableFromDate
+		return m.ListingReference
 	}
 	return ""
 }
 
-func (m *ListUpdateRequest) GetBathrooms() int32 {
+func (m *ListingUpdateRequest) GetLocation() *Location {
 	if m != nil {
-		return m.Bathrooms
+		return m.Location
 	}
-	return 0
+	return nil
 }
 
-func (m *ListUpdateRequest) GetDisplayAddress() string {
+func (m *ListingUpdateRequest) GetPricing() *Pricing {
 	if m != nil {
-		return m.DisplayAddress
+		return m.Pricing
+	}
+	return nil
+}
+
+func (m *ListingUpdateRequest) GetPropertyType() string {
+	if m != nil {
+		return m.PropertyType
 	}
 	return ""
 }
 
-func (m *ListUpdateRequest) GetRentalTerm() string {
-	if m != nil {
-		return m.RentalTerm
-	}
-	return ""
-}
-
-func (m *ListUpdateRequest) GetTotalBedrooms() int32 {
-	if m != nil {
-		return m.TotalBedrooms
-	}
-	return 0
-}
-
-type ListUpdateResponse struct {
+type ListingUpdateResponse struct {
 	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	ListingReference     string   `protobuf:"bytes,2,opt,name=listingReference,proto3" json:"listingReference,omitempty"`
 	Etag                 string   `protobuf:"bytes,3,opt,name=etag,proto3" json:"etag,omitempty"`
@@ -1357,217 +619,386 @@ type ListUpdateResponse struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ListUpdateResponse) Reset()         { *m = ListUpdateResponse{} }
-func (m *ListUpdateResponse) String() string { return proto.CompactTextString(m) }
-func (*ListUpdateResponse) ProtoMessage()    {}
-func (*ListUpdateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_00212fb1f9d3bf1c, []int{17}
+func (m *ListingUpdateResponse) Reset()         { *m = ListingUpdateResponse{} }
+func (m *ListingUpdateResponse) String() string { return proto.CompactTextString(m) }
+func (*ListingUpdateResponse) ProtoMessage()    {}
+func (*ListingUpdateResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{9}
 }
 
-func (m *ListUpdateResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListUpdateResponse.Unmarshal(m, b)
+func (m *ListingUpdateResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListingUpdateResponse.Unmarshal(m, b)
 }
-func (m *ListUpdateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListUpdateResponse.Marshal(b, m, deterministic)
+func (m *ListingUpdateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListingUpdateResponse.Marshal(b, m, deterministic)
 }
-func (m *ListUpdateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListUpdateResponse.Merge(m, src)
+func (m *ListingUpdateResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListingUpdateResponse.Merge(m, src)
 }
-func (m *ListUpdateResponse) XXX_Size() int {
-	return xxx_messageInfo_ListUpdateResponse.Size(m)
+func (m *ListingUpdateResponse) XXX_Size() int {
+	return xxx_messageInfo_ListingUpdateResponse.Size(m)
 }
-func (m *ListUpdateResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListUpdateResponse.DiscardUnknown(m)
+func (m *ListingUpdateResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListingUpdateResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ListUpdateResponse proto.InternalMessageInfo
+var xxx_messageInfo_ListingUpdateResponse proto.InternalMessageInfo
 
-func (m *ListUpdateResponse) GetStatus() string {
+func (m *ListingUpdateResponse) GetStatus() string {
 	if m != nil {
 		return m.Status
 	}
 	return ""
 }
 
-func (m *ListUpdateResponse) GetListingReference() string {
+func (m *ListingUpdateResponse) GetListingReference() string {
 	if m != nil {
 		return m.ListingReference
 	}
 	return ""
 }
 
-func (m *ListUpdateResponse) GetEtag() string {
+func (m *ListingUpdateResponse) GetEtag() string {
 	if m != nil {
 		return m.Etag
 	}
 	return ""
 }
 
-func (m *ListUpdateResponse) GetUrl() string {
+func (m *ListingUpdateResponse) GetUrl() string {
 	if m != nil {
 		return m.Url
 	}
 	return ""
 }
 
-func (m *ListUpdateResponse) GetNewListing() bool {
+func (m *ListingUpdateResponse) GetNewListing() bool {
 	if m != nil {
 		return m.NewListing
 	}
 	return false
 }
 
+type ListingDeleteRequest struct {
+	ListingReference     string   `protobuf:"bytes,1,opt,name=listingReference,proto3" json:"listingReference,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListingDeleteRequest) Reset()         { *m = ListingDeleteRequest{} }
+func (m *ListingDeleteRequest) String() string { return proto.CompactTextString(m) }
+func (*ListingDeleteRequest) ProtoMessage()    {}
+func (*ListingDeleteRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{10}
+}
+
+func (m *ListingDeleteRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListingDeleteRequest.Unmarshal(m, b)
+}
+func (m *ListingDeleteRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListingDeleteRequest.Marshal(b, m, deterministic)
+}
+func (m *ListingDeleteRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListingDeleteRequest.Merge(m, src)
+}
+func (m *ListingDeleteRequest) XXX_Size() int {
+	return xxx_messageInfo_ListingDeleteRequest.Size(m)
+}
+func (m *ListingDeleteRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListingDeleteRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListingDeleteRequest proto.InternalMessageInfo
+
+func (m *ListingDeleteRequest) GetListingReference() string {
+	if m != nil {
+		return m.ListingReference
+	}
+	return ""
+}
+
+type ListingDeleteResponse struct {
+	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	ListingReference     string   `protobuf:"bytes,2,opt,name=listingReference,proto3" json:"listingReference,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListingDeleteResponse) Reset()         { *m = ListingDeleteResponse{} }
+func (m *ListingDeleteResponse) String() string { return proto.CompactTextString(m) }
+func (*ListingDeleteResponse) ProtoMessage()    {}
+func (*ListingDeleteResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{11}
+}
+
+func (m *ListingDeleteResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListingDeleteResponse.Unmarshal(m, b)
+}
+func (m *ListingDeleteResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListingDeleteResponse.Marshal(b, m, deterministic)
+}
+func (m *ListingDeleteResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListingDeleteResponse.Merge(m, src)
+}
+func (m *ListingDeleteResponse) XXX_Size() int {
+	return xxx_messageInfo_ListingDeleteResponse.Size(m)
+}
+func (m *ListingDeleteResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListingDeleteResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListingDeleteResponse proto.InternalMessageInfo
+
+func (m *ListingDeleteResponse) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *ListingDeleteResponse) GetListingReference() string {
+	if m != nil {
+		return m.ListingReference
+	}
+	return ""
+}
+
+type ListingListRequest struct {
+	BranchReference      string   `protobuf:"bytes,1,opt,name=branchReference,proto3" json:"branchReference,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListingListRequest) Reset()         { *m = ListingListRequest{} }
+func (m *ListingListRequest) String() string { return proto.CompactTextString(m) }
+func (*ListingListRequest) ProtoMessage()    {}
+func (*ListingListRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{12}
+}
+
+func (m *ListingListRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListingListRequest.Unmarshal(m, b)
+}
+func (m *ListingListRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListingListRequest.Marshal(b, m, deterministic)
+}
+func (m *ListingListRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListingListRequest.Merge(m, src)
+}
+func (m *ListingListRequest) XXX_Size() int {
+	return xxx_messageInfo_ListingListRequest.Size(m)
+}
+func (m *ListingListRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListingListRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListingListRequest proto.InternalMessageInfo
+
+func (m *ListingListRequest) GetBranchReference() string {
+	if m != nil {
+		return m.BranchReference
+	}
+	return ""
+}
+
+type Listing struct {
+	ListingReference     string   `protobuf:"bytes,1,opt,name=ListingReference,proto3" json:"ListingReference,omitempty"`
+	ListingEtag          string   `protobuf:"bytes,2,opt,name=ListingEtag,proto3" json:"ListingEtag,omitempty"`
+	URL                  string   `protobuf:"bytes,3,opt,name=URL,proto3" json:"URL,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Listing) Reset()         { *m = Listing{} }
+func (m *Listing) String() string { return proto.CompactTextString(m) }
+func (*Listing) ProtoMessage()    {}
+func (*Listing) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{13}
+}
+
+func (m *Listing) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Listing.Unmarshal(m, b)
+}
+func (m *Listing) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Listing.Marshal(b, m, deterministic)
+}
+func (m *Listing) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Listing.Merge(m, src)
+}
+func (m *Listing) XXX_Size() int {
+	return xxx_messageInfo_Listing.Size(m)
+}
+func (m *Listing) XXX_DiscardUnknown() {
+	xxx_messageInfo_Listing.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Listing proto.InternalMessageInfo
+
+func (m *Listing) GetListingReference() string {
+	if m != nil {
+		return m.ListingReference
+	}
+	return ""
+}
+
+func (m *Listing) GetListingEtag() string {
+	if m != nil {
+		return m.ListingEtag
+	}
+	return ""
+}
+
+func (m *Listing) GetURL() string {
+	if m != nil {
+		return m.URL
+	}
+	return ""
+}
+
+type ListingListResponse struct {
+	Status               string     `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	BranchReference      string     `protobuf:"bytes,2,opt,name=branchReference,proto3" json:"branchReference,omitempty"`
+	Listings             []*Listing `protobuf:"bytes,3,rep,name=listings,proto3" json:"listings,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *ListingListResponse) Reset()         { *m = ListingListResponse{} }
+func (m *ListingListResponse) String() string { return proto.CompactTextString(m) }
+func (*ListingListResponse) ProtoMessage()    {}
+func (*ListingListResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_00212fb1f9d3bf1c, []int{14}
+}
+
+func (m *ListingListResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListingListResponse.Unmarshal(m, b)
+}
+func (m *ListingListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListingListResponse.Marshal(b, m, deterministic)
+}
+func (m *ListingListResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListingListResponse.Merge(m, src)
+}
+func (m *ListingListResponse) XXX_Size() int {
+	return xxx_messageInfo_ListingListResponse.Size(m)
+}
+func (m *ListingListResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListingListResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListingListResponse proto.InternalMessageInfo
+
+func (m *ListingListResponse) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *ListingListResponse) GetBranchReference() string {
+	if m != nil {
+		return m.BranchReference
+	}
+	return ""
+}
+
+func (m *ListingListResponse) GetListings() []*Listing {
+	if m != nil {
+		return m.Listings
+	}
+	return nil
+}
+
 func init() {
-	proto.RegisterEnum("mashroom.zoopla.PropertyStatus", PropertyStatus_name, PropertyStatus_value)
-	proto.RegisterEnum("mashroom.zoopla.PropertyType", PropertyType_name, PropertyType_value)
-	proto.RegisterEnum("mashroom.zoopla.PropertyTaxBand", PropertyTaxBand_name, PropertyTaxBand_value)
-	proto.RegisterEnum("mashroom.zoopla.PropertyAvailabilityType", PropertyAvailabilityType_name, PropertyAvailabilityType_value)
-	proto.RegisterType((*PropertyAvailabilitySlot)(nil), "mashroom.zoopla.PropertyAvailabilitySlot")
-	proto.RegisterType((*PropertyLocation)(nil), "mashroom.zoopla.PropertyLocation")
-	proto.RegisterType((*Property)(nil), "mashroom.zoopla.Property")
-	proto.RegisterType((*PropertyRequest)(nil), "mashroom.zoopla.PropertyRequest")
-	proto.RegisterType((*PropertyResponse)(nil), "mashroom.zoopla.PropertyResponse")
+	proto.RegisterEnum("mashroom.zoopla.Pricing_TransactionType", Pricing_TransactionType_name, Pricing_TransactionType_value)
+	proto.RegisterEnum("mashroom.zoopla.Pricing_RentFrequency", Pricing_RentFrequency_name, Pricing_RentFrequency_value)
 	proto.RegisterType((*Coordinates)(nil), "mashroom.zoopla.Coordinates")
 	proto.RegisterType((*PafAddress)(nil), "mashroom.zoopla.PafAddress")
 	proto.RegisterType((*Location)(nil), "mashroom.zoopla.Location")
 	proto.RegisterType((*DetailedDescription)(nil), "mashroom.zoopla.DetailedDescription")
 	proto.RegisterType((*PricePerUnitArea)(nil), "mashroom.zoopla.PricePerUnitArea")
-	proto.RegisterType((*Area)(nil), "mashroom.zoopla.Area")
-	proto.RegisterType((*MinMaxArea)(nil), "mashroom.zoopla.MinMaxArea")
-	proto.RegisterType((*Areas)(nil), "mashroom.zoopla.Areas")
 	proto.RegisterType((*Pricing)(nil), "mashroom.zoopla.Pricing")
 	proto.RegisterType((*BranchUpdateRequest)(nil), "mashroom.zoopla.BranchUpdateRequest")
 	proto.RegisterType((*BranchUpdateResponse)(nil), "mashroom.zoopla.BranchUpdateResponse")
-	proto.RegisterType((*ListUpdateRequest)(nil), "mashroom.zoopla.ListUpdateRequest")
-	proto.RegisterType((*ListUpdateResponse)(nil), "mashroom.zoopla.ListUpdateResponse")
+	proto.RegisterType((*ListingUpdateRequest)(nil), "mashroom.zoopla.ListingUpdateRequest")
+	proto.RegisterType((*ListingUpdateResponse)(nil), "mashroom.zoopla.ListingUpdateResponse")
+	proto.RegisterType((*ListingDeleteRequest)(nil), "mashroom.zoopla.ListingDeleteRequest")
+	proto.RegisterType((*ListingDeleteResponse)(nil), "mashroom.zoopla.ListingDeleteResponse")
+	proto.RegisterType((*ListingListRequest)(nil), "mashroom.zoopla.ListingListRequest")
+	proto.RegisterType((*Listing)(nil), "mashroom.zoopla.Listing")
+	proto.RegisterType((*ListingListResponse)(nil), "mashroom.zoopla.ListingListResponse")
 }
 
 func init() { proto.RegisterFile("api.proto", fileDescriptor_00212fb1f9d3bf1c) }
 
 var fileDescriptor_00212fb1f9d3bf1c = []byte{
-	// 1951 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x58, 0xdb, 0x72, 0x1b, 0xc7,
-	0x11, 0x15, 0x40, 0x82, 0xc0, 0x36, 0x40, 0x70, 0x35, 0xa2, 0x54, 0x2b, 0xda, 0x52, 0x28, 0x44,
-	0x71, 0x29, 0x2c, 0x07, 0xb4, 0x69, 0x47, 0xce, 0x4d, 0x4e, 0x70, 0xa3, 0x84, 0x32, 0x08, 0x30,
-	0x0b, 0x90, 0x8a, 0x9c, 0x07, 0xd4, 0x00, 0x3b, 0x04, 0xb7, 0xb8, 0x98, 0x5d, 0xcf, 0xce, 0x92,
-	0x84, 0xff, 0x21, 0xaf, 0x79, 0x4c, 0xe5, 0x21, 0x9f, 0x93, 0x2f, 0xc9, 0x57, 0xa4, 0x7a, 0x76,
-	0x16, 0x17, 0x02, 0x14, 0xf9, 0xa0, 0x27, 0xee, 0x9c, 0xe9, 0xd3, 0x73, 0xe9, 0xee, 0x33, 0x0d,
-	0x82, 0x41, 0x03, 0xb7, 0x1c, 0x08, 0x5f, 0xfa, 0x64, 0x6b, 0x4c, 0xc3, 0x73, 0xe1, 0xfb, 0xe3,
-	0xf2, 0xcf, 0xbe, 0x1f, 0x78, 0x74, 0xe7, 0xf9, 0xc8, 0xf7, 0x47, 0x1e, 0xdb, 0x57, 0xd3, 0x83,
-	0xe8, 0x6c, 0xff, 0x4a, 0xd0, 0x20, 0x60, 0x22, 0x8c, 0x09, 0xa5, 0xff, 0xa5, 0xc0, 0x3a, 0x16,
-	0x7e, 0xc0, 0x84, 0x9c, 0x54, 0x2e, 0xa9, 0xeb, 0xd1, 0x81, 0xeb, 0xb9, 0x72, 0xd2, 0xf5, 0x7c,
-	0x49, 0x9e, 0x42, 0xee, 0x8a, 0xb1, 0x8b, 0xbe, 0x43, 0x27, 0x56, 0x6a, 0x37, 0xf5, 0x2a, 0x63,
-	0x67, 0x71, 0x5c, 0xa7, 0x13, 0xf2, 0x0c, 0x40, 0xba, 0x63, 0xd6, 0x0f, 0x25, 0x15, 0xd2, 0x4a,
-	0xab, 0x49, 0x03, 0x91, 0x2e, 0x02, 0xc8, 0x54, 0xd3, 0x8c, 0x3b, 0xd6, 0x5a, 0xcc, 0xc4, 0x71,
-	0x83, 0x3b, 0xe4, 0x0d, 0xac, 0xcb, 0x49, 0xc0, 0xac, 0xf5, 0xdd, 0xd4, 0xab, 0xe2, 0xc1, 0xaf,
-	0xcb, 0x37, 0x76, 0x5c, 0x5e, 0xb5, 0x9b, 0xde, 0x24, 0x60, 0xb6, 0xa2, 0x11, 0x13, 0xd6, 0x70,
-	0x3b, 0x19, 0xe5, 0x14, 0x3f, 0xc9, 0x36, 0x64, 0xc6, 0x3e, 0x97, 0xe7, 0xd6, 0x86, 0xc2, 0xe2,
-	0x01, 0x21, 0xb0, 0x3e, 0x61, 0x54, 0x58, 0x59, 0x05, 0xaa, 0xef, 0x52, 0x0b, 0xcc, 0xc4, 0x7b,
-	0xcb, 0x1f, 0x52, 0xe9, 0xfa, 0x9c, 0x7c, 0x0e, 0x86, 0xe7, 0xf3, 0x91, 0x2b, 0x23, 0x87, 0xa9,
-	0x43, 0xa6, 0xec, 0x19, 0x40, 0x76, 0x20, 0xe7, 0x51, 0x19, 0x4f, 0xa6, 0xd5, 0xe4, 0x74, 0x5c,
-	0xfa, 0xb7, 0x01, 0xb9, 0xc4, 0x1d, 0x29, 0x42, 0xda, 0x75, 0x14, 0xdf, 0xb0, 0xd3, 0xae, 0x43,
-	0xbe, 0x82, 0xf5, 0xa1, 0x2b, 0x27, 0x8a, 0x94, 0x3f, 0xf8, 0xbc, 0x1c, 0x87, 0xa1, 0x9c, 0x84,
-	0xa1, 0xdc, 0x95, 0xc2, 0xe5, 0xa3, 0x53, 0xea, 0x45, 0xcc, 0x56, 0x96, 0xe4, 0x35, 0x64, 0xa9,
-	0xe3, 0x08, 0x16, 0x86, 0xea, 0xc6, 0xee, 0x22, 0x25, 0xc6, 0xe4, 0x77, 0x90, 0x0b, 0xfc, 0x50,
-	0x0e, 0x7d, 0x27, 0xbe, 0xd3, 0xbb, 0x88, 0x53, 0x6b, 0xf2, 0x67, 0x28, 0x0c, 0xfd, 0x88, 0x4b,
-	0x31, 0xe9, 0x2b, 0x76, 0xe6, 0x1e, 0xec, 0xbc, 0x66, 0xd4, 0xd0, 0xc1, 0x1b, 0xc8, 0x0f, 0x22,
-	0xd7, 0x73, 0x5c, 0x3e, 0xea, 0xbb, 0x8e, 0xba, 0xff, 0xbb, 0xf8, 0x90, 0x10, 0x9a, 0x98, 0x09,
-	0x79, 0x8f, 0x72, 0xc7, 0xf3, 0x85, 0x83, 0xf4, 0xec, 0x7d, 0xe8, 0x09, 0xa1, 0xe9, 0xe0, 0xf6,
-	0xc3, 0x68, 0x30, 0x76, 0xa5, 0x64, 0x02, 0xf9, 0xb9, 0xfb, 0x6c, 0x7f, 0xca, 0x68, 0x3a, 0x2a,
-	0x87, 0x19, 0xa7, 0x5c, 0xf6, 0x5d, 0x27, 0xb4, 0x8c, 0xdd, 0xb5, 0x57, 0x86, 0x6d, 0xc4, 0x48,
-	0xd3, 0x09, 0xc9, 0xef, 0xc1, 0x90, 0xe7, 0x82, 0x51, 0xb5, 0x39, 0xb8, 0xcf, 0xcd, 0xc6, 0xe6,
-	0x4d, 0x87, 0xfc, 0x01, 0x60, 0x28, 0x18, 0x95, 0xcc, 0xe9, 0x53, 0x69, 0xe5, 0x15, 0xf7, 0xb3,
-	0x25, 0x6e, 0x93, 0xcb, 0xd7, 0xdf, 0xc6, 0x54, 0x43, 0x9b, 0x57, 0x24, 0xf9, 0x0e, 0x36, 0x42,
-	0x49, 0x65, 0x14, 0x5a, 0x05, 0x55, 0x21, 0xbf, 0xb8, 0xb5, 0x42, 0xba, 0xca, 0xcc, 0xd6, 0xe6,
-	0xe4, 0x6b, 0x5d, 0x58, 0x9b, 0x8a, 0xf6, 0xec, 0x56, 0xda, 0x5c, 0x31, 0x95, 0x61, 0x2d, 0xfc,
-	0x69, 0x6c, 0x15, 0x6f, 0x39, 0x5c, 0xdd, 0x8f, 0x06, 0x1e, 0x8b, 0x77, 0x88, 0x86, 0xe4, 0x2f,
-	0x90, 0x8f, 0x2e, 0xfa, 0x92, 0x5e, 0xf7, 0x07, 0x94, 0x3b, 0xd6, 0x96, 0x5a, 0x69, 0xf7, 0xf6,
-	0x95, 0xe8, 0x75, 0x95, 0x72, 0xc7, 0x36, 0xa2, 0x0b, 0xfd, 0x89, 0x65, 0x29, 0xe9, 0x28, 0xb4,
-	0x4c, 0x75, 0xdb, 0xea, 0x9b, 0x34, 0x81, 0x28, 0x19, 0x61, 0x4e, 0xdf, 0x73, 0x43, 0x89, 0xd9,
-	0x44, 0xa5, 0xf5, 0xf0, 0xee, 0x5b, 0x33, 0x35, 0xad, 0x15, 0xb3, 0x2a, 0x92, 0x34, 0xc0, 0x64,
-	0xdc, 0x59, 0x74, 0x44, 0xee, 0x76, 0x54, 0x54, 0xa4, 0x99, 0x9b, 0x23, 0x28, 0xd0, 0x39, 0xf9,
-	0xb1, 0x1e, 0xed, 0xae, 0xbd, 0xca, 0xdf, 0x53, 0xab, 0x50, 0x39, 0xed, 0x05, 0x3a, 0x96, 0xa8,
-	0x3b, 0xa6, 0x23, 0x36, 0x78, 0xfd, 0xad, 0xb5, 0x7d, 0x9f, 0x44, 0x4a, 0xac, 0xc9, 0x1b, 0xc8,
-	0x79, 0x5a, 0xa9, 0xac, 0xc7, 0x8a, 0xf9, 0xe2, 0xd6, 0x4d, 0x24, 0x92, 0x66, 0x4f, 0x29, 0xa5,
-	0xaf, 0x60, 0x2b, 0x99, 0xb5, 0xd9, 0x4f, 0x11, 0x0b, 0x25, 0x26, 0x7d, 0xe8, 0x8f, 0x59, 0xff,
-	0xcc, 0x65, 0x5e, 0x22, 0x58, 0x06, 0x22, 0x87, 0x08, 0x94, 0xf6, 0x66, 0x12, 0x69, 0xb3, 0x30,
-	0xf0, 0x79, 0xc8, 0xc8, 0x93, 0x69, 0x46, 0xc6, 0xe6, 0x7a, 0x54, 0x7a, 0x0b, 0xf9, 0x9a, 0xef,
-	0x0b, 0xc7, 0xe5, 0x54, 0xb2, 0x10, 0xb5, 0xb2, 0x95, 0x68, 0x65, 0x6a, 0x51, 0x2b, 0x51, 0x65,
-	0x5b, 0x53, 0x95, 0x4d, 0xdf, 0x50, 0xd9, 0xd2, 0xcf, 0x00, 0xc7, 0xf4, 0xac, 0xa2, 0x05, 0xed,
-	0x39, 0x80, 0xfe, 0xfc, 0x81, 0x4d, 0xf4, 0x92, 0x40, 0xa7, 0x08, 0x79, 0x05, 0x5b, 0x1d, 0x31,
-	0xa2, 0xdc, 0x0d, 0xd5, 0x21, 0xd1, 0x28, 0xad, 0x8c, 0xb6, 0xfc, 0x45, 0x98, 0x94, 0xa0, 0x70,
-	0xac, 0xc5, 0x0e, 0x93, 0x5e, 0xe9, 0xaa, 0x61, 0x17, 0x82, 0x39, 0xac, 0xf4, 0x8f, 0x35, 0xc8,
-	0x4d, 0x1f, 0x83, 0x5d, 0x3c, 0xd1, 0x54, 0xdf, 0xf4, 0xda, 0x0b, 0x92, 0xf7, 0x04, 0x36, 0x94,
-	0x45, 0xb2, 0xe6, 0x86, 0x9a, 0x9c, 0xa8, 0xc3, 0xfb, 0x43, 0xaa, 0xb2, 0x25, 0x5e, 0x46, 0x45,
-	0x41, 0x85, 0x7f, 0x07, 0x72, 0xc7, 0xf4, 0xec, 0xc4, 0x09, 0x04, 0x57, 0x0a, 0x6d, 0xd8, 0xb9,
-	0x40, 0x8f, 0xf1, 0xb0, 0xb8, 0x45, 0xea, 0xd5, 0x12, 0x05, 0x36, 0x6c, 0x08, 0xa6, 0x08, 0x39,
-	0x80, 0xed, 0x24, 0x1e, 0xed, 0x68, 0x3c, 0x60, 0xa2, 0x23, 0xda, 0x74, 0xcc, 0x94, 0xd6, 0x1a,
-	0xf6, 0x76, 0xb0, 0x62, 0x0e, 0x7d, 0x76, 0xa5, 0x60, 0x4c, 0x2a, 0xcb, 0x6c, 0xec, 0x33, 0x9c,
-	0x22, 0x38, 0xdf, 0xf3, 0xaf, 0x78, 0x47, 0xd4, 0x70, 0xb7, 0xb9, 0x78, 0x5e, 0x4e, 0x11, 0xf2,
-	0xfd, 0x42, 0x5c, 0x2d, 0x43, 0x67, 0xec, 0xcd, 0xbc, 0x9b, 0xb3, 0xc1, 0x3b, 0x9a, 0x25, 0xc2,
-	0x1f, 0xe7, 0xc3, 0xa9, 0x95, 0xf3, 0xb3, 0xe5, 0xb4, 0x9d, 0x9a, 0xd8, 0x10, 0x4c, 0xbf, 0x4b,
-	0x43, 0x78, 0x54, 0x67, 0x92, 0xba, 0x1e, 0x73, 0xea, 0x2c, 0x1c, 0x0a, 0x37, 0x50, 0x91, 0x79,
-	0x0e, 0x50, 0x77, 0xc7, 0x8c, 0x87, 0xae, 0xcf, 0x93, 0x3c, 0x04, 0x67, 0x8a, 0x10, 0x0b, 0xb2,
-	0xef, 0x18, 0xc5, 0x87, 0x45, 0x07, 0x26, 0x7b, 0x1e, 0x0f, 0x51, 0x71, 0x7a, 0xec, 0x5a, 0xea,
-	0xa8, 0xac, 0x4b, 0x76, 0x2d, 0x4b, 0xdf, 0x63, 0x96, 0xbb, 0x43, 0x76, 0xcc, 0xc4, 0x09, 0x77,
-	0x65, 0x45, 0x30, 0x8a, 0x6d, 0x84, 0xc2, 0x74, 0xee, 0x66, 0x02, 0x1c, 0x20, 0x8a, 0x16, 0xa1,
-	0xf6, 0x9a, 0x89, 0x70, 0x50, 0x3a, 0x80, 0xf5, 0x84, 0x13, 0xcf, 0xa6, 0xe6, 0x66, 0x11, 0x55,
-	0x75, 0xac, 0x13, 0x3d, 0x73, 0x89, 0x83, 0x12, 0x07, 0x38, 0x72, 0xf9, 0x11, 0xbd, 0x56, 0xcc,
-	0x7d, 0xc8, 0x1e, 0xd1, 0x6b, 0x77, 0x1c, 0x8d, 0x15, 0x37, 0x7f, 0xf0, 0x78, 0xe9, 0x82, 0xd0,
-	0xce, 0xce, 0x8e, 0x63, 0x2b, 0x45, 0x70, 0xb9, 0x22, 0xa4, 0x3f, 0x4e, 0x88, 0xad, 0x4a, 0x13,
-	0xc8, 0x20, 0x10, 0x92, 0xef, 0x20, 0xd7, 0xb8, 0x96, 0x4c, 0x70, 0xea, 0xe9, 0xb5, 0x96, 0x83,
-	0x31, 0xdb, 0x99, 0x9d, 0x63, 0xda, 0x18, 0x89, 0x4d, 0xae, 0x89, 0xe9, 0x7b, 0x10, 0x5d, 0x6d,
-	0x5c, 0xfa, 0x4f, 0x1a, 0xb2, 0x78, 0x97, 0x78, 0xfd, 0x16, 0x64, 0x2b, 0xd1, 0x50, 0x09, 0x18,
-	0x2e, 0x9e, 0xb3, 0xb3, 0x34, 0x1e, 0x62, 0x75, 0xd6, 0x22, 0x21, 0x18, 0x1f, 0xc6, 0xd5, 0x16,
-	0xdf, 0x70, 0x61, 0x38, 0x87, 0xcd, 0x82, 0xb2, 0x36, 0x1f, 0x94, 0xa3, 0xe5, 0xf0, 0xe9, 0xd6,
-	0x67, 0x95, 0x3a, 0x2e, 0x1a, 0xda, 0x66, 0x70, 0x33, 0xf2, 0x5f, 0x40, 0x51, 0x59, 0xfd, 0x35,
-	0xa2, 0x9e, 0x7b, 0xe6, 0x32, 0xa1, 0xeb, 0xb0, 0x18, 0x2c, 0xa0, 0xe4, 0x25, 0x6c, 0xda, 0x8c,
-	0xcb, 0x43, 0x81, 0x52, 0xca, 0x87, 0x13, 0x5d, 0x84, 0x9b, 0x62, 0x1e, 0x44, 0x79, 0xea, 0x09,
-	0xca, 0x43, 0xaa, 0x4e, 0xa9, 0x74, 0x27, 0x2e, 0xc1, 0x2d, 0xb9, 0x08, 0x97, 0x1e, 0xc3, 0xa3,
-	0xaa, 0xa0, 0x7c, 0x78, 0x7e, 0x12, 0x38, 0x54, 0x32, 0xad, 0xd0, 0xa5, 0x4b, 0xd8, 0x5e, 0x84,
-	0x3f, 0x2e, 0xc3, 0xb8, 0xe0, 0x40, 0xd9, 0xdb, 0xec, 0x8c, 0xe1, 0xd5, 0x25, 0x57, 0x79, 0x13,
-	0x46, 0x15, 0xe6, 0xec, 0x2a, 0x76, 0xae, 0x6e, 0x34, 0x67, 0xcf, 0x80, 0xd2, 0x7f, 0x33, 0xf0,
-	0x10, 0x9f, 0xc0, 0x85, 0xdd, 0xa0, 0xf7, 0xea, 0x0d, 0xef, 0xa9, 0xd5, 0xde, 0x77, 0x20, 0x57,
-	0xa3, 0x92, 0x8d, 0x7c, 0x91, 0x88, 0x63, 0x6e, 0xa8, 0xc7, 0x64, 0x0f, 0x4c, 0xfd, 0xba, 0xce,
-	0xdc, 0xc4, 0x05, 0x69, 0x7a, 0x37, 0x70, 0xf2, 0xdb, 0x99, 0x20, 0xeb, 0xa8, 0x3e, 0x5d, 0x8a,
-	0xea, 0xf2, 0x5b, 0x47, 0x0e, 0xa6, 0x39, 0xa7, 0x1b, 0x59, 0x6b, 0x65, 0x2e, 0xe0, 0x52, 0xd9,
-	0x40, 0x27, 0x27, 0x3e, 0x10, 0x73, 0x5d, 0x91, 0x0e, 0x68, 0x21, 0x98, 0xc3, 0xc8, 0x97, 0xba,
-	0x8e, 0x74, 0x7f, 0xfa, 0x64, 0x65, 0xd9, 0x85, 0x76, 0x86, 0xaa, 0x62, 0x7b, 0x09, 0x9b, 0x55,
-	0xd7, 0xf3, 0xc2, 0x26, 0x1f, 0x7a, 0x91, 0xc3, 0xb0, 0x2b, 0xc5, 0x46, 0x67, 0x73, 0x30, 0x0f,
-	0x92, 0xd3, 0x95, 0x22, 0xa7, 0x5a, 0xd0, 0xfc, 0xc1, 0xcb, 0xa5, 0x15, 0x56, 0xd8, 0xda, 0x8f,
-	0x9c, 0x15, 0x2a, 0xf9, 0x05, 0x14, 0x0f, 0x23, 0xc1, 0xdd, 0xf0, 0x9c, 0x39, 0xd8, 0x1d, 0x32,
-	0xa5, 0xbe, 0x86, 0x5d, 0x3c, 0x5b, 0x40, 0x31, 0xa8, 0x2d, 0xf7, 0x8c, 0xd5, 0x26, 0x43, 0x8f,
-	0xc5, 0x5d, 0xa4, 0x6a, 0x52, 0x0d, 0x7b, 0xcb, 0x5b, 0x84, 0xc9, 0x97, 0xf0, 0x50, 0x37, 0x37,
-	0x1e, 0x3b, 0x14, 0xfe, 0xb8, 0x8e, 0x4e, 0x0b, 0xca, 0xf6, 0x21, 0xbd, 0x39, 0x81, 0x09, 0x56,
-	0xa5, 0x52, 0xed, 0x3d, 0x54, 0x7d, 0x68, 0xc6, 0x36, 0x06, 0x09, 0x80, 0xbb, 0xab, 0xbb, 0x61,
-	0xe0, 0xd1, 0x49, 0xf2, 0x36, 0x14, 0xe3, 0xdd, 0x39, 0x0b, 0x28, 0x6a, 0x3d, 0xd6, 0x19, 0xf5,
-	0x7a, 0x4c, 0x8c, 0x55, 0x93, 0x69, 0xd8, 0x20, 0xa6, 0x08, 0xde, 0x71, 0xcf, 0x97, 0xd4, 0xab,
-	0x32, 0x27, 0x5e, 0xc9, 0x54, 0x2b, 0x6d, 0xca, 0x79, 0xb0, 0xf4, 0xaf, 0x14, 0x90, 0xf9, 0x74,
-	0xbe, 0xa3, 0x8a, 0xf6, 0x60, 0x29, 0x13, 0x75, 0x16, 0x2f, 0x67, 0x28, 0x81, 0x75, 0x26, 0xe9,
-	0x28, 0x79, 0x52, 0xf0, 0x1b, 0x7f, 0x97, 0x46, 0xc2, 0xd3, 0xef, 0x3b, 0x7e, 0xe2, 0x31, 0x38,
-	0xbb, 0xd2, 0x69, 0xaf, 0x72, 0x32, 0x67, 0xcf, 0x21, 0x7b, 0x5d, 0x94, 0x9d, 0xf9, 0x4e, 0x9e,
-	0x10, 0x28, 0x9e, 0xb4, 0x7f, 0x68, 0x77, 0xde, 0xb7, 0xfb, 0xdd, 0x5e, 0xa5, 0x77, 0xd2, 0x35,
-	0x1f, 0x10, 0x80, 0x8d, 0x4a, 0xad, 0xd7, 0x3c, 0x6d, 0x98, 0x29, 0xf2, 0x02, 0x9e, 0x1d, 0x37,
-	0xda, 0xf5, 0x66, 0xfb, 0x6d, 0xbf, 0x55, 0x69, 0xd7, 0x5b, 0x1d, 0xbb, 0xde, 0xaf, 0x75, 0xda,
-	0x87, 0x4d, 0xfb, 0xa8, 0xd2, 0x6b, 0x76, 0xda, 0x66, 0x7a, 0xef, 0x72, 0x31, 0xa3, 0x89, 0x09,
-	0x85, 0xc4, 0x65, 0xef, 0xc3, 0x71, 0x23, 0x76, 0xd8, 0xed, 0x9d, 0xd4, 0x9b, 0x1d, 0x33, 0x45,
-	0xb6, 0x20, 0xdf, 0x69, 0x37, 0xfa, 0xd5, 0x46, 0xdd, 0xee, 0x74, 0x8e, 0xcc, 0x34, 0x9a, 0xf7,
-	0xde, 0x77, 0x12, 0xa0, 0x6b, 0xae, 0xe1, 0x9e, 0x7a, 0xef, 0xec, 0x46, 0x63, 0x86, 0xad, 0x93,
-	0x87, 0xb0, 0x79, 0xd8, 0x39, 0xb1, 0x67, 0x50, 0x66, 0xef, 0x4f, 0xb3, 0x4e, 0x33, 0x69, 0xf5,
-	0xb7, 0xc1, 0x9c, 0x2e, 0x5d, 0xf9, 0x5b, 0xbf, 0x5a, 0x69, 0xd7, 0xcd, 0x07, 0x24, 0x03, 0xa9,
-	0x8a, 0x99, 0xc2, 0x3f, 0x55, 0x33, 0x8d, 0x7f, 0x6a, 0xe6, 0xda, 0x9e, 0xbd, 0xfa, 0x9f, 0x10,
-	0xea, 0x04, 0x16, 0x6c, 0x27, 0x6e, 0x2a, 0xa7, 0x95, 0x66, 0xab, 0x52, 0x6d, 0xb6, 0x9a, 0xbd,
-	0x0f, 0xe6, 0x03, 0xb2, 0x09, 0xc6, 0xfb, 0x77, 0x9d, 0x56, 0xa3, 0x5f, 0xaf, 0x7c, 0x30, 0x53,
-	0x38, 0xec, 0x35, 0x8f, 0x1a, 0xfd, 0xee, 0x71, 0xa5, 0x6d, 0xa6, 0x0f, 0xfe, 0xb9, 0x0e, 0x9b,
-	0x3f, 0xaa, 0xfa, 0xe9, 0x32, 0x71, 0x89, 0xcf, 0xc6, 0xdf, 0xa1, 0x30, 0x2f, 0xac, 0x64, 0xb9,
-	0xd0, 0x56, 0xc8, 0xf1, 0xce, 0xaf, 0xee, 0xb0, 0xd2, 0x79, 0x75, 0x0c, 0xc5, 0x18, 0x99, 0xfe,
-	0x4b, 0xe0, 0xe9, 0xad, 0x9d, 0xfa, 0xce, 0x2f, 0x97, 0x05, 0x6d, 0x39, 0x53, 0x4f, 0xa0, 0x58,
-	0x67, 0x1e, 0x9b, 0xf3, 0x78, 0xfb, 0x2f, 0xad, 0x64, 0xb3, 0x2f, 0x3e, 0x62, 0xa1, 0xdd, 0x76,
-	0xa1, 0x80, 0x8b, 0x7d, 0x5a, 0xa7, 0x36, 0xe4, 0xdf, 0xb2, 0x4f, 0xec, 0xf3, 0x14, 0xb6, 0xe6,
-	0x7c, 0x36, 0xf9, 0x99, 0xff, 0x49, 0xfc, 0x56, 0xbf, 0xf9, 0xf1, 0xeb, 0x91, 0x2b, 0x3d, 0x3a,
-	0x28, 0xfb, 0x17, 0x92, 0xfe, 0x26, 0xf4, 0xbd, 0x08, 0xc5, 0x33, 0x2c, 0x0f, 0xfd, 0xf1, 0x7e,
-	0xc2, 0xde, 0x1f, 0xd0, 0xe1, 0x05, 0xe3, 0xce, 0x7e, 0xec, 0x65, 0xb0, 0xa1, 0x7e, 0xa8, 0x7d,
-	0xf3, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0x5b, 0xff, 0xc9, 0x47, 0x6c, 0x13, 0x00, 0x00,
+	// 970 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0x4d, 0x6f, 0xdb, 0x46,
+	0x13, 0x0e, 0x2d, 0xc7, 0x96, 0x46, 0xb6, 0x45, 0xac, 0x9d, 0xf7, 0x55, 0x8d, 0x20, 0x10, 0xd8,
+	0x38, 0x10, 0x02, 0x54, 0x46, 0x95, 0xf6, 0x6a, 0x20, 0x96, 0xfb, 0x01, 0x54, 0x88, 0x05, 0x5a,
+	0xee, 0x21, 0x39, 0x18, 0x2b, 0x72, 0x2c, 0x13, 0xa6, 0x76, 0x99, 0xdd, 0x55, 0x5c, 0xe5, 0xd4,
+	0x43, 0xaf, 0xfd, 0x01, 0x3d, 0xf6, 0x2f, 0xf6, 0x17, 0x14, 0xbb, 0x5c, 0x8a, 0x1f, 0x92, 0xea,
+	0x4b, 0x4e, 0xe2, 0x3c, 0xfb, 0xec, 0xec, 0x7c, 0x3c, 0x33, 0x10, 0x34, 0x68, 0x12, 0xf5, 0x12,
+	0xc1, 0x15, 0x27, 0xad, 0x19, 0x95, 0x77, 0x82, 0xf3, 0x59, 0xef, 0x33, 0xe7, 0x49, 0x4c, 0xbd,
+	0x9f, 0xa0, 0x39, 0xe0, 0x5c, 0x84, 0x11, 0xa3, 0x0a, 0x25, 0x39, 0x86, 0xfa, 0x90, 0xaa, 0x48,
+	0xcd, 0x43, 0x6c, 0x3b, 0x1d, 0xa7, 0xeb, 0xf8, 0x4b, 0x9b, 0x3c, 0x87, 0xc6, 0x90, 0xb3, 0x69,
+	0x7a, 0xb8, 0x65, 0x0e, 0x73, 0xc0, 0xfb, 0x0c, 0x30, 0xa2, 0xb7, 0x6f, 0xc3, 0x50, 0xa0, 0x94,
+	0xe4, 0x05, 0x80, 0xfd, 0xfc, 0x05, 0x17, 0xc6, 0x53, 0xc3, 0x2f, 0x20, 0xa4, 0x0b, 0xad, 0x4b,
+	0x31, 0xa5, 0x2c, 0x92, 0x54, 0x45, 0x9c, 0x69, 0xd2, 0x96, 0x21, 0x55, 0x61, 0xe2, 0xc1, 0xde,
+	0x88, 0x4b, 0x15, 0xf0, 0x10, 0xc7, 0x8b, 0x04, 0xdb, 0x35, 0x43, 0x2b, 0x61, 0xde, 0xef, 0x5b,
+	0x50, 0x1f, 0xf2, 0xc0, 0xdc, 0x21, 0x1d, 0x9d, 0xd1, 0x9c, 0x29, 0xb1, 0x18, 0x70, 0x9b, 0x45,
+	0xc3, 0x2f, 0x42, 0x3a, 0x38, 0x7d, 0x9d, 0xc6, 0x86, 0x90, 0xbe, 0x5b, 0x40, 0x48, 0x1f, 0x8e,
+	0x46, 0x82, 0x27, 0x28, 0xd4, 0xe2, 0xdd, 0x7c, 0x36, 0x41, 0x71, 0x29, 0xde, 0xd1, 0x59, 0xf6,
+	0xf4, 0xda, 0x33, 0xed, 0xf3, 0x4a, 0x09, 0x44, 0x65, 0x98, 0xdb, 0xa9, 0xcf, 0x1c, 0xd1, 0xe7,
+	0x63, 0xfe, 0xc0, 0x2e, 0xc5, 0x20, 0x52, 0x8b, 0xf6, 0xd3, 0xf4, 0x3c, 0x47, 0xc8, 0x59, 0xa9,
+	0x0f, 0xed, 0x9d, 0x8e, 0xd3, 0x6d, 0xf6, 0x9f, 0xf7, 0x2a, 0xed, 0xea, 0x15, 0x38, 0x7e, 0xf1,
+	0x82, 0x17, 0xc0, 0xe1, 0x05, 0x2a, 0x1a, 0xc5, 0x18, 0x5e, 0xa0, 0x0c, 0x44, 0x94, 0x98, 0x62,
+	0xbc, 0x00, 0xb8, 0x88, 0x66, 0xc8, 0x64, 0xc4, 0x99, 0xcc, 0xfa, 0x90, 0x23, 0xa4, 0x0d, 0xbb,
+	0x3f, 0x23, 0x0d, 0x23, 0x36, 0xb5, 0x75, 0xc8, 0x4c, 0x42, 0x60, 0x7b, 0x8c, 0xbf, 0x29, 0x9b,
+	0xb4, 0xf9, 0xf6, 0xce, 0xc0, 0x1d, 0x89, 0x28, 0xc0, 0x11, 0x8a, 0x6b, 0x16, 0xa9, 0xb7, 0x02,
+	0x29, 0x39, 0x82, 0xa7, 0x06, 0xb3, 0x72, 0x49, 0x0d, 0x8d, 0x6a, 0x86, 0xb4, 0x5e, 0x53, 0xc3,
+	0xfb, 0x67, 0x0b, 0x76, 0xf5, 0xb9, 0xf6, 0xef, 0x43, 0x4b, 0x09, 0xca, 0x24, 0x0d, 0x74, 0xa0,
+	0xa6, 0xb5, 0xda, 0xc3, 0x41, 0xbf, 0xbb, 0x92, 0xb4, 0xbd, 0xd2, 0x1b, 0x97, 0xf9, 0x7e, 0xd5,
+	0x81, 0xd6, 0xca, 0x60, 0x2e, 0x04, 0xb2, 0x60, 0x51, 0x68, 0x6d, 0x09, 0xcb, 0xe3, 0xad, 0x15,
+	0xe3, 0x1d, 0xc2, 0xbe, 0x40, 0xa6, 0x7e, 0x14, 0xf8, 0x71, 0xae, 0xa9, 0xa6, 0x83, 0x07, 0xfd,
+	0x57, 0x1b, 0x63, 0xf1, 0x8b, 0x6c, 0xbf, 0x7c, 0xd9, 0x3b, 0x81, 0x56, 0x25, 0x56, 0x52, 0x87,
+	0x6d, 0xcd, 0x71, 0x9f, 0xe8, 0x2f, 0x49, 0x63, 0x74, 0x1d, 0x2f, 0x84, 0xfd, 0x92, 0x1b, 0xf2,
+	0x7f, 0x38, 0x4c, 0x50, 0xdc, 0x24, 0x28, 0x24, 0x67, 0xfa, 0xe7, 0xe6, 0x01, 0xf1, 0xde, 0x7d,
+	0x42, 0xf6, 0xa0, 0xbe, 0xb4, 0x1c, 0xb2, 0x0f, 0x0d, 0x6d, 0xcd, 0x38, 0x53, 0x77, 0xee, 0x16,
+	0x69, 0x41, 0x53, 0x9b, 0x1f, 0xe7, 0x54, 0x28, 0x14, 0x6e, 0x2d, 0x63, 0x2f, 0x90, 0x0a, 0x77,
+	0xdb, 0x7b, 0x06, 0x87, 0xe7, 0x82, 0xb2, 0xe0, 0xee, 0x3a, 0x09, 0xa9, 0x42, 0x5f, 0x3f, 0x26,
+	0x95, 0xf7, 0x09, 0x8e, 0xca, 0xb0, 0x4c, 0x38, 0x93, 0x48, 0xfe, 0x07, 0x3b, 0x52, 0x51, 0x35,
+	0xcf, 0xd4, 0x62, 0x2d, 0x3d, 0xb1, 0x13, 0xc3, 0xf7, 0xf1, 0x16, 0x75, 0x39, 0xb3, 0xf2, 0x56,
+	0x61, 0xbd, 0x27, 0x18, 0x3e, 0xa4, 0xce, 0x4d, 0x95, 0xeb, 0x7e, 0x0e, 0x78, 0x7f, 0xd5, 0xe0,
+	0x68, 0x18, 0x49, 0x15, 0xb1, 0x69, 0x29, 0x20, 0xfd, 0xc0, 0x79, 0xe5, 0x81, 0x34, 0x82, 0x2a,
+	0xac, 0x97, 0xd4, 0x80, 0x2a, 0x9c, 0x72, 0x91, 0x6d, 0x8d, 0xa5, 0x4d, 0x7e, 0x5d, 0x3b, 0x07,
+	0xed, 0x5a, 0xa7, 0xd6, 0x6d, 0xf6, 0x5f, 0xae, 0xb4, 0x73, 0x0d, 0xd7, 0x5f, 0x3b, 0x48, 0x5d,
+	0x68, 0x0d, 0xa3, 0x5b, 0x1c, 0x2c, 0x82, 0x18, 0xaf, 0xd2, 0xfa, 0xa4, 0x43, 0x5e, 0x85, 0xc9,
+	0x6b, 0x70, 0x6d, 0x7e, 0x79, 0x22, 0xe9, 0xbc, 0xaf, 0xe0, 0xe4, 0xfb, 0x7c, 0x6f, 0xd9, 0x91,
+	0xff, 0x6a, 0x25, 0xc4, 0x8c, 0xe0, 0xe7, 0x2b, 0xae, 0xbf, 0x1c, 0xa3, 0xf6, 0xae, 0xb9, 0xd5,
+	0xde, 0xa4, 0x53, 0x7f, 0x39, 0x6f, 0x7a, 0x8f, 0xda, 0xc5, 0x65, 0x86, 0xad, 0x6e, 0xf7, 0x68,
+	0x01, 0xf3, 0xfe, 0x76, 0xe0, 0x59, 0xa5, 0x37, 0x8f, 0xa8, 0xe2, 0x35, 0xb8, 0x71, 0x35, 0xd9,
+	0xb4, 0x25, 0x2b, 0xb8, 0xde, 0x28, 0xa8, 0xe8, 0x34, 0xdb, 0x28, 0xfa, 0x9b, 0xb8, 0x50, 0x9b,
+	0x8b, 0xd8, 0x96, 0x52, 0x7f, 0xea, 0x8d, 0xc5, 0xf0, 0xc1, 0x46, 0x61, 0x0a, 0x57, 0xf7, 0x0b,
+	0x88, 0x77, 0xbe, 0x94, 0xcf, 0x05, 0xc6, 0x98, 0xcb, 0x67, 0x5d, 0x24, 0xce, 0xfa, 0x48, 0xbc,
+	0x0f, 0xcb, 0x34, 0x33, 0x1f, 0x5f, 0x2e, 0x4d, 0xef, 0x0c, 0x88, 0x75, 0xae, 0x7f, 0x0a, 0xea,
+	0x9e, 0xac, 0x57, 0x77, 0x05, 0xf6, 0x22, 0xd8, 0xb5, 0xf7, 0xd7, 0x4a, 0xc9, 0xd9, 0x20, 0xa5,
+	0x0e, 0x34, 0x2d, 0xf6, 0x83, 0x2e, 0x72, 0x1a, 0x5d, 0x11, 0xd2, 0xb5, 0xbe, 0xf6, 0x87, 0xb6,
+	0xfc, 0xfa, 0xd3, 0xfb, 0xd3, 0x81, 0xc3, 0x52, 0xac, 0x5f, 0x6c, 0x07, 0x7c, 0x07, 0x75, 0x5b,
+	0x18, 0x69, 0x67, 0x6f, 0x55, 0xa2, 0x59, 0x0a, 0x4b, 0x66, 0xff, 0x8f, 0x1a, 0xec, 0xbf, 0x37,
+	0x87, 0x57, 0x28, 0x3e, 0xe9, 0xbd, 0xfc, 0x01, 0xf6, 0x8a, 0x5b, 0x8a, 0xac, 0x4e, 0xf0, 0x9a,
+	0xdd, 0x76, 0x7c, 0xf2, 0x08, 0xcb, 0xa6, 0x79, 0x03, 0x07, 0x29, 0x92, 0x0d, 0x01, 0x39, 0xd9,
+	0x14, 0x64, 0xd9, 0xff, 0xab, 0xc7, 0x68, 0xf9, 0x03, 0xa9, 0xc0, 0x1e, 0x7f, 0xa0, 0x24, 0xe6,
+	0xcd, 0x0f, 0x54, 0xf4, 0x3a, 0xce, 0xb5, 0xf2, 0xf5, 0xa6, 0x2b, 0x05, 0x15, 0x1e, 0xbf, 0xfc,
+	0x6f, 0x52, 0xea, 0xf5, 0xfc, 0xcd, 0xfb, 0x6f, 0xa7, 0x91, 0x8a, 0xe9, 0xa4, 0xc7, 0xef, 0x15,
+	0xfd, 0x46, 0xf2, 0x78, 0xae, 0xd7, 0x8e, 0xec, 0x05, 0x7c, 0x76, 0x9a, 0x39, 0x38, 0x9d, 0xd0,
+	0xe0, 0x1e, 0x59, 0x78, 0x9a, 0x3a, 0x9a, 0xec, 0x98, 0x3f, 0x98, 0x6f, 0xfe, 0x0d, 0x00, 0x00,
+	0xff, 0xff, 0xb6, 0x11, 0xfb, 0xf7, 0x6d, 0x0a, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1583,11 +1014,9 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ZooplaServiceClient interface {
 	BranchUpdate(ctx context.Context, in *BranchUpdateRequest, opts ...grpc.CallOption) (*BranchUpdateResponse, error)
-	UpdateProperty(ctx context.Context, in *Property, opts ...grpc.CallOption) (*ListUpdateResponse, error)
-	DeleteProperty(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
-	ListProperty(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
-	GetProperty(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
-	GetPropertyInfo(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error)
+	UpdateProperty(ctx context.Context, in *ListingUpdateRequest, opts ...grpc.CallOption) (*ListingUpdateResponse, error)
+	DeleteProperty(ctx context.Context, in *ListingDeleteRequest, opts ...grpc.CallOption) (*ListingDeleteResponse, error)
+	Listing(ctx context.Context, in *ListingListRequest, opts ...grpc.CallOption) (*ListingListResponse, error)
 }
 
 type zooplaServiceClient struct {
@@ -1607,8 +1036,8 @@ func (c *zooplaServiceClient) BranchUpdate(ctx context.Context, in *BranchUpdate
 	return out, nil
 }
 
-func (c *zooplaServiceClient) UpdateProperty(ctx context.Context, in *Property, opts ...grpc.CallOption) (*ListUpdateResponse, error) {
-	out := new(ListUpdateResponse)
+func (c *zooplaServiceClient) UpdateProperty(ctx context.Context, in *ListingUpdateRequest, opts ...grpc.CallOption) (*ListingUpdateResponse, error) {
+	out := new(ListingUpdateResponse)
 	err := c.cc.Invoke(ctx, "/mashroom.zoopla.ZooplaService/UpdateProperty", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1616,8 +1045,8 @@ func (c *zooplaServiceClient) UpdateProperty(ctx context.Context, in *Property, 
 	return out, nil
 }
 
-func (c *zooplaServiceClient) DeleteProperty(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error) {
-	out := new(PropertyResponse)
+func (c *zooplaServiceClient) DeleteProperty(ctx context.Context, in *ListingDeleteRequest, opts ...grpc.CallOption) (*ListingDeleteResponse, error) {
+	out := new(ListingDeleteResponse)
 	err := c.cc.Invoke(ctx, "/mashroom.zoopla.ZooplaService/DeleteProperty", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1625,27 +1054,9 @@ func (c *zooplaServiceClient) DeleteProperty(ctx context.Context, in *PropertyRe
 	return out, nil
 }
 
-func (c *zooplaServiceClient) ListProperty(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error) {
-	out := new(PropertyResponse)
-	err := c.cc.Invoke(ctx, "/mashroom.zoopla.ZooplaService/ListProperty", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *zooplaServiceClient) GetProperty(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error) {
-	out := new(PropertyResponse)
-	err := c.cc.Invoke(ctx, "/mashroom.zoopla.ZooplaService/GetProperty", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *zooplaServiceClient) GetPropertyInfo(ctx context.Context, in *PropertyRequest, opts ...grpc.CallOption) (*PropertyResponse, error) {
-	out := new(PropertyResponse)
-	err := c.cc.Invoke(ctx, "/mashroom.zoopla.ZooplaService/GetPropertyInfo", in, out, opts...)
+func (c *zooplaServiceClient) Listing(ctx context.Context, in *ListingListRequest, opts ...grpc.CallOption) (*ListingListResponse, error) {
+	out := new(ListingListResponse)
+	err := c.cc.Invoke(ctx, "/mashroom.zoopla.ZooplaService/Listing", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1655,11 +1066,9 @@ func (c *zooplaServiceClient) GetPropertyInfo(ctx context.Context, in *PropertyR
 // ZooplaServiceServer is the server API for ZooplaService service.
 type ZooplaServiceServer interface {
 	BranchUpdate(context.Context, *BranchUpdateRequest) (*BranchUpdateResponse, error)
-	UpdateProperty(context.Context, *Property) (*ListUpdateResponse, error)
-	DeleteProperty(context.Context, *PropertyRequest) (*PropertyResponse, error)
-	ListProperty(context.Context, *PropertyRequest) (*PropertyResponse, error)
-	GetProperty(context.Context, *PropertyRequest) (*PropertyResponse, error)
-	GetPropertyInfo(context.Context, *PropertyRequest) (*PropertyResponse, error)
+	UpdateProperty(context.Context, *ListingUpdateRequest) (*ListingUpdateResponse, error)
+	DeleteProperty(context.Context, *ListingDeleteRequest) (*ListingDeleteResponse, error)
+	Listing(context.Context, *ListingListRequest) (*ListingListResponse, error)
 }
 
 func RegisterZooplaServiceServer(s *grpc.Server, srv ZooplaServiceServer) {
@@ -1685,7 +1094,7 @@ func _ZooplaService_BranchUpdate_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _ZooplaService_UpdateProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Property)
+	in := new(ListingUpdateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1697,13 +1106,13 @@ func _ZooplaService_UpdateProperty_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/mashroom.zoopla.ZooplaService/UpdateProperty",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ZooplaServiceServer).UpdateProperty(ctx, req.(*Property))
+		return srv.(ZooplaServiceServer).UpdateProperty(ctx, req.(*ListingUpdateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _ZooplaService_DeleteProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PropertyRequest)
+	in := new(ListingDeleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1715,61 +1124,25 @@ func _ZooplaService_DeleteProperty_Handler(srv interface{}, ctx context.Context,
 		FullMethod: "/mashroom.zoopla.ZooplaService/DeleteProperty",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ZooplaServiceServer).DeleteProperty(ctx, req.(*PropertyRequest))
+		return srv.(ZooplaServiceServer).DeleteProperty(ctx, req.(*ListingDeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ZooplaService_ListProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PropertyRequest)
+func _ZooplaService_Listing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListingListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ZooplaServiceServer).ListProperty(ctx, in)
+		return srv.(ZooplaServiceServer).Listing(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mashroom.zoopla.ZooplaService/ListProperty",
+		FullMethod: "/mashroom.zoopla.ZooplaService/Listing",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ZooplaServiceServer).ListProperty(ctx, req.(*PropertyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ZooplaService_GetProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PropertyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ZooplaServiceServer).GetProperty(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/mashroom.zoopla.ZooplaService/GetProperty",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ZooplaServiceServer).GetProperty(ctx, req.(*PropertyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ZooplaService_GetPropertyInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PropertyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ZooplaServiceServer).GetPropertyInfo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/mashroom.zoopla.ZooplaService/GetPropertyInfo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ZooplaServiceServer).GetPropertyInfo(ctx, req.(*PropertyRequest))
+		return srv.(ZooplaServiceServer).Listing(ctx, req.(*ListingListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1791,16 +1164,8 @@ var _ZooplaService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ZooplaService_DeleteProperty_Handler,
 		},
 		{
-			MethodName: "ListProperty",
-			Handler:    _ZooplaService_ListProperty_Handler,
-		},
-		{
-			MethodName: "GetProperty",
-			Handler:    _ZooplaService_GetProperty_Handler,
-		},
-		{
-			MethodName: "GetPropertyInfo",
-			Handler:    _ZooplaService_GetPropertyInfo_Handler,
+			MethodName: "Listing",
+			Handler:    _ZooplaService_Listing_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

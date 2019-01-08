@@ -2,84 +2,9 @@ syntax = "proto3";
 
 package mashroom.zoopla;
 
-import "google/protobuf/wrappers.proto";
+//import "google/protobuf/wrappers.proto";
 
 option go_package = "gitlab.okta-solutions.com/mashroom/backend/zoopla";
-
-enum PropertyStatus {
-    UNKNOWN_STATUS = 0;
-    ACTIVE = 1;
-    PENDING_LANDLORD_CONFIRMATION = 2;
-}
-
-enum PropertyType {
-    UNKNOWN_TYPE = 0;
-    STUDIO = 1;
-    ONE_BEDROOM = 2;
-    TWO_BEDROOMS = 3;
-    THREE_BEDROOMS = 4;
-    FOUR_BEDROOMS = 5;
-}
-
-enum PropertyTaxBand {
-    UNKNOWN_TAX_BAND = 0;
-    A = 1;
-    B = 2;
-    C = 3;
-}
-
-enum PropertyAvailabilityType {
-    UNKNOWN_AVAILABILITY = 0;
-    WHOLE_DAY = 1;
-    TIME_SPAN = 2;
-}
-
-message PropertyAvailabilitySlot {
-    int32 week_day = 1; // Monday = 1, Sunday = 7; if 0 use date
-    int32 time_start = 2; // 13:40 = 1340
-    int32 time_end = 3;
-    PropertyAvailabilityType type = 4;
-    int32 day = 5;
-    int32 month = 6;
-    int32 year = 7;
-}
-
-message PropertyLocation {
-    double longitude = 1;
-    double latitude = 2;
-}
-
-message Property {
-    string id = 1;
-    google.protobuf.StringValue city = 2;
-    google.protobuf.StringValue address = 3;
-    google.protobuf.StringValue postcode = 4;
-    google.protobuf.StringValue country_code = 5;
-    google.protobuf.StringValue building_id = 6;
-    google.protobuf.StringValue landlord_id = 7;
-    google.protobuf.StringValue submitter_id = 8;
-    repeated string tenant_ids = 9;
-    google.protobuf.StringValue thread_id = 10;
-    google.protobuf.Int64Value created_at = 11;
-    PropertyStatus status = 12;
-    PropertyType type = 13;
-    google.protobuf.DoubleValue sqm = 14;
-    PropertyTaxBand uk_tax_band = 15;
-    repeated string tags = 16;
-    google.protobuf.Int64Value started_listing_at = 17;
-    google.protobuf.Int64Value ended_listing_at = 18;
-    repeated PropertyAvailabilitySlot availability = 19;
-    google.protobuf.StringValue imageb64 = 20;
-    PropertyLocation location = 21;
-}
-
-message PropertyRequest {
-    string some_field = 1;
-}
-
-message PropertyResponse {
-    string status = 1;
-}
 
 message Coordinates {
     double Latitude = 1;
@@ -94,15 +19,15 @@ message PafAddress {
 
 message Location {
     string CountryCode = 1;
-    string County = 2;
-    string Locality = 3;
-    string PafUdprn = 4;
-    string PostalCode = 5;
-    string PropertyNumberOrName = 6;
-    string StreetName = 7;
-    string TownOrCity = 8;
-    Coordinates Coordinates = 9;
-    PafAddress PafAddress = 10;
+    string PostalCode = 2;
+    string PropertyNumberOrName = 3;
+    string StreetName = 4;
+    string TownOrCity = 5;
+    Coordinates Coordinates = 6;
+    //string County = 2;
+    // string Locality = 3;
+    //   string PafUdprn = 4;
+    //  PafAddress PafAddress = 10;
 }
 
 message DetailedDescription {
@@ -116,30 +41,29 @@ message PricePerUnitArea {
     string Units = 2;
 }
 
-message Area {
-    string Units = 1;
-    double Value = 2;
-}
-
-message MinMaxArea {
-    Area Maximum = 1;
-    Area Minimum = 2;
-}
-
-message Areas {
-    MinMaxArea External = 1;
-    MinMaxArea Internal = 2;
-}
-
 message Pricing {
-    bool Auction = 1;
+    enum TransactionType {
+        rent = 0;
+        sale = 1;
+    }
+    TransactionType transactionType = 1;
     string CurrencyCode = 2;
     double Price = 3;
-    PricePerUnitArea PricePerUnitArea = 4;
-    string PriceQualifier = 5;
-    string RentFrequency = 6;
-    string TransactionType = 7;
+    enum RentFrequency {
+        per_person_per_week = 0;
+        per_week = 1;
+        per_month = 2;
+        per_quarter = 3;
+        per_year = 4;
+    }
+    RentFrequency rentFrequency = 4;
+
+    // bool Auction = 7;
+    // PricePerUnitArea PricePerUnitArea = 6;
+    // string PriceQualifier = 5;
+    //string TransactionType = 7;
 }
+
 
 message BranchUpdateRequest {
 }
@@ -150,26 +74,27 @@ message BranchUpdateResponse {
     bool newBranch = 3;
 }
 
-message ListUpdateRequest {
+message ListingUpdateRequest {
     string BranchReference = 1;
     string Category = 2;
-    string ListingReference = 3;
-    Location Location = 4;
-    Pricing Pricing = 5;
-    string PropertyType = 6;
-    Areas Areas = 7;
-    repeated string BillsIncluded = 8;
-    repeated DetailedDescription DetailedDescription = 9;
-    string FurnishedState = 10;
-    string LifeCycleStatus = 11;
-    string AvailableFromDate = 12;
-    int32 Bathrooms = 13;
-    string DisplayAddress = 14;
-    string RentalTerm = 15;
-    int32 TotalBedrooms = 16;
+    repeated DetailedDescription DetailedDescription = 3;
+    string LifeCycleStatus = 4;
+    string ListingReference = 5;
+    Location Location = 6;
+    Pricing Pricing = 7;
+    string PropertyType = 8;
+
+    //    Areas Areas = 9;
+    //    repeated string BillsIncluded = 11;
+    //    string FurnishedState = 10;
+    //    string AvailableFromDate = 12;
+    //    int32 Bathrooms = 13;
+    //    string DisplayAddress = 14;
+    //    string RentalTerm = 15;
+    //    int32 TotalBedrooms = 16;
 }
 
-message ListUpdateResponse {
+message ListingUpdateResponse {
     string status = 1;
     string listingReference = 2;
     string etag = 3;
@@ -177,13 +102,36 @@ message ListUpdateResponse {
     bool newListing = 5;
 }
 
+message ListingDeleteRequest {
+    string listingReference = 1;
+}
+
+message ListingDeleteResponse {
+    string status = 1;
+    string listingReference = 2;
+}
+
+message ListingListRequest {
+    string branchReference = 1;
+}
+
+message Listing {
+    string ListingReference = 1;
+    string ListingEtag = 2;
+    string URL = 3;
+}
+
+message ListingListResponse {
+    string status = 1;
+    string branchReference = 2;
+    repeated Listing listings = 3;
+}
+
 service ZooplaService {
     rpc BranchUpdate (BranchUpdateRequest) returns (BranchUpdateResponse);
-    rpc UpdateProperty (Property) returns (ListUpdateResponse);
-    rpc DeleteProperty (PropertyRequest) returns (PropertyResponse);
-    rpc ListProperty (PropertyRequest) returns (PropertyResponse);
-    rpc GetProperty (PropertyRequest) returns (PropertyResponse);
-    rpc GetPropertyInfo (PropertyRequest) returns (PropertyResponse);
+    rpc UpdateProperty (ListingUpdateRequest) returns (ListingUpdateResponse);
+    rpc DeleteProperty (ListingDeleteRequest) returns (ListingDeleteResponse);
+    rpc Listing (ListingListRequest) returns (ListingListResponse);
 
 
 }

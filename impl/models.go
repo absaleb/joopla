@@ -12,25 +12,30 @@ type ZooplaBranchUpdateRequest struct {
 type ZooplaListingUpdateRequest struct {
 	BranchReference     string                 `json:"branch_reference"`
 	Category            string                 `json:"category"`
+	DetailedDescription []*DetailedDescription `json:"detailed_description"`
+	LifeCycleStatus     string                 `json:"life_cycle_status"`
 	ListingReference    string                 `json:"listing_reference"`
 	Location            *Location              `json:"location"`
 	Pricing             *Pricing               `json:"pricing"`
 	PropertyType        string                 `json:"property_type"`
-	Areas               *Areas                 `json:"areas"`
-	BillsIncluded       []string               `json:"bills_included"`
-	DetailedDescription []*DetailedDescription `json:"detailed_description"`
-	FurnishedState      string                 `json:"furnished_state"`
-	LifeCycleStatus     string                 `json:"life_cycle_status"`
-	AvailableFromDate   string                 `json:"available_from_date"`
-	Bathrooms         int32    `json:"bathrooms"`
-	DisplayAddress    string `json:"display_address"`
-	RentalTerm        string `json:"rental_term"`
-	TotalBedrooms     int32    `json:"total_bedrooms"`
+
+	//Areas               *Areas                 `json:"areas"`
+	//BillsIncluded       []string               `json:"bills_included"`
+	//FurnishedState      string                 `json:"furnished_state"`
+	//AvailableFromDate   string                 `json:"available_from_date"`
+	//Bathrooms         int32    `json:"bathrooms"`
+	//DisplayAddress    string `json:"display_address"`
+	//RentalTerm        string `json:"rental_term"`
+	//TotalBedrooms     int32    `json:"total_bedrooms"`
+}
+
+type ZooplaListingRequest struct {
+	BranchReference string `json:"branch_reference"`
 }
 
 type ZooplaListingDeleteRequest struct {
-	DeletionReason   string `json:"deletion_reason,omitempty"`
 	ListingReference string `json:"listing_reference"`
+	DeletionReason   string `json:"deletion_reason,omitempty"`
 }
 
 type ZooplaListingListRequest struct {
@@ -76,10 +81,10 @@ type Coordinates struct {
 type Location struct {
 	Coordinates          *Coordinates `json:"coordinates,omitempty"`
 	CountryCode          string       `json:"country_code"`
-	County               string       `json:"county,omitempty"`
-	Locality             string       `json:"locality,omitempty"`
-	PafAddress           *PafAddress  `json:"paf_address,omitempty"`
-	PafUdprn             string       `json:"paf_udprn,omitempty"`
+	//County               string       `json:"county,omitempty"`
+	//Locality             string       `json:"locality,omitempty"`
+	//PafAddress           *PafAddress  `json:"paf_address,omitempty"`
+	//PafUdprn             string       `json:"paf_udprn,omitempty"`
 	PostalCode           string       `json:"postal_code,omitempty"`
 	PropertyNumberOrName interface{}  `json:"property_number_or_name,omitempty"`
 	StreetName           string       `json:"street_name,omitempty"`
